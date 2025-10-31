@@ -1,0 +1,37 @@
+ship1:
+  file: "data\\sprite_sheets\\destroyer.png"
+  rect: [0, 0, 478, 348]
+  rotation: -90
+  scale: 0.25
+ship2:
+  file: "data\\sprite_sheets\\cruiser.png"
+  rect: [0, 0, 397, 149]
+  rotation: -90
+  scale: 0.25
+ship3:
+  file: "data\\sprite_sheets\\Example_ships\\1B.png"
+  scale: 0.75
+explosion1:
+  file: "data\\sprite_sheets\\explosions.png"
+  frame_duration: 0.03
+  rects: [[957,774,64,64],
+          [892,766,64,64],
+          [958,708,64,64],
+          [826,760,64,64],
+          [892,700,64,64],
+          [958,642,64,64],
+          [826,694,64,64],
+          [826,634,64,64],
+          [826,628,64,64],
+          [760,708,64,64],
+          [760,642,64,64],
+          [698,808,64,64],
+          [694,708,64,64],
+          [694,642,64,64],
+          [906,568,64,64],
+          [840,562,64,64],
+          [774,562,64,64],
+          [708,562,64,64],
+          [642,938,64,64],
+          [632,872,64,64]]
+  
