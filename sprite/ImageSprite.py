@@ -58,9 +58,7 @@ class AnimatedImageSprite(WorldSprite):
         rotated_height=abs(height*math.cos(self.angle)+abs(width*math.sin(self.angle)))
         return (screen_position[0]-rotated_width/2,screen_position[1]-rotated_height/2,rotated_width,rotated_height)
     
-    def draw(self, screen, camera):
-        print("on image ",self.current_frame)
-        print("out of ",len(self.images))
+    def draw(self, screen, camera):        
         image=self.images[self.current_frame]
         if camera.zoom !=1:
             image=pygame.transform.scale(image,(int(image.get_width()*camera.zoom),int(image.get_height()*camera.zoom)))        

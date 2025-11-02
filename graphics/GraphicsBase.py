@@ -1,7 +1,4 @@
 
-from numpy import size
-
-
 class Camera:
     #info for mapping 2d world coords to 2d screen coords
     def __init__(self, position=(0, 0), zoom=1.0):

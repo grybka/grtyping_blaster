@@ -1,6 +1,5 @@
 import pygame
-from game_state.GameManager import GameManager
-from game_state.PlayGameLevel import PlayGameLevel
+from game_state.PlayGameLevel import PlayGameLevel,GameManager
 
 pygame.init()
 pygame.font.init()
@@ -16,11 +15,11 @@ if displayinfo.current_w*0.9<max_x:
 if displayinfo.current_h*0.8<max_y:
     max_y=int(displayinfo.current_h*0.8)
 resolution=(max_x,max_y)
-screen=pygame.display.set_mode(resolution)
+screen=pygame.display.set_mode(resolution,pygame.DOUBLEBUF | pygame.HWSURFACE) 
+
 
 #set up game manager
-#game_manager=GameManager()
-game_manager=PlayGameLevel(screen)
+game_manager=GameManager(screen,PlayGameLevel(screen))
 
 running=True
 while running:

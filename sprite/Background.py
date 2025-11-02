@@ -6,6 +6,10 @@ class Background(ScreenSprite):
     def __init__(self):
         super().__init__()
 
+    def update_property(self, property_name, property_value):
+        #Override in subclasses to handle property updates
+        pass
+
 class BackgroundStarField(Background):
     def __init__(self, avg_num_stars, velocity=0):
         super().__init__()
@@ -22,6 +26,14 @@ class BackgroundStarField(Background):
             y = random.randint(0, screen_size[1])
             self.stars.append((x, y))
         print("velocity:", self.velocity)
+
+    
+    def update_property(self, property_name, property_value):
+        if property_name=="velocity":
+            print("BackgroundStarField: updating velocity to", property_value)
+            self.velocity=property_value
+            return True
+        return super().update_property(property_name, property_value)
 
     def draw(self, screen, camera):
         if len(self.stars)==0:

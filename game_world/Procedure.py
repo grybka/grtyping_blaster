@@ -19,6 +19,30 @@ class ProcedureStep:
         #So we can have generic properties, we use this
         return False
 
+class SimultaneousProcedureStep(ProcedureStep):
+    def __init__(self, steps=None):
+        super().__init__()
+        if steps is None:
+            steps = []
+        self.steps=steps
+
+    def add_step(self,step: ProcedureStep):
+        self.steps.append(step)
+
+    def start_step(self):
+        for step in self.steps:
+            step.start_step()
+
+    def update(self, time_delta):
+        for step in self.steps:
+            step.update(time_delta)
+
+    def step_done(self):
+        return all([step.step_done() for step in self.steps])
+    
+    def set_property(self, property_name, value):
+        tf=[ step.set_property(property_name, value) for step in self.steps]
+        return any(tf)
 
 
 class Procedure:
@@ -35,6 +59,8 @@ class Procedure:
         if self.on_step == -1 and len(self.procedure_steps) > 0:
             self.on_step = 0
             self.procedure_steps[0].start_step()
+        if len(self.procedure_steps)==0:
+            return
         if self.on_step < len(self.procedure_steps):
             current_step = self.procedure_steps[self.on_step]
             current_step.update(time_delta)

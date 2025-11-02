@@ -4,6 +4,7 @@ from game_world.Procedure import Procedure, ProcedureStep
 from game_world.WorldProcedures import WP_DamagePlayer
 from sprite.SpriteMotionScript import SMSE_MoveToPosition, SMSE_MoveToPosition_Smooth, SMSE_MoveToSprite, SMSE_RemoveSprite, SMSE_SetPosition
 from sprite.TestCircle import TestCircle
+from sound.Sound import get_sound_store
 
 lev_debug=True
 
@@ -100,6 +101,21 @@ class LSE_SetBackground(LevelScriptElement):
     def step_done(self):
         return self.is_done
     
+class LSE_UpdateBackground(LevelScriptElement):
+    def __init__(self, game_world, property_name, property_value):
+        super().__init__(game_world)
+        self.property_name = property_name
+        self.property_value = property_value
+        self.is_done = False
+
+    def update(self, time_delta):
+        #print("LSE_UpdateBackground: updating", self.property_name, "to", self.property_value)
+        self.game_world.graphics.update_background_property(self.property_name, self.property_value)
+        self.is_done = True
+
+    def step_done(self):
+        return self.is_done
+    
 
 class LSE_TargetShootPlayer(LevelScriptElement):
     def __init__(self, game_world, source_target, damage_amount,n_shots=1, time_between_shots=1):
@@ -130,6 +146,9 @@ class LSE_TargetShootPlayer(LevelScriptElement):
         #generate a script that shoots the player from the source
         source_pos=self.source.sprite_with_window.get_world_position(None)
         bullet=TestCircle(radius=5)
+        #Play the shooting sound (Should I move this to the bullet procedure?  Maybe)
+        get_sound_store().play_sound("enemy_laser")
+
         #print("source pos:", source_pos, "player pos:", player_pos)
         self.game_world.graphics.add_sprite(bullet)
         to_do=Procedure([
@@ -146,6 +165,7 @@ class LSE_TargetShootPlayer(LevelScriptElement):
     def step_done(self):
         return self.is_done
     
+
 class LSE_EndLevel(LevelScriptElement):
     def __init__(self, game_world):
         super().__init__(game_world)
@@ -157,6 +177,28 @@ class LSE_EndLevel(LevelScriptElement):
 
     def step_done(self):
         return self.is_done
+    
+class LSE_PlayerWarpsAway(LevelScriptElement):
+    def __init__(self, game_world, warp_position):
+        super().__init__(game_world)
+        self.warp_position = warp_position
+        self.is_done = False
+        self.my_steps = None
+
+    def update(self, time_delta):
+        if self.my_steps is None:
+            player_sprite = self.game_world.get_player_sprite()
+            self.my_steps = Procedure([
+                SMSE_MoveToPosition_Smooth(player_sprite,initial_position=None,initial_velocity=(0,0),final_velocity=(0,1000), final_position=self.warp_position, duration=2.0),                
+                LSE_EndLevel(self.game_world)
+            ])
+        self.my_steps.update(time_delta)
+        if self.my_steps.is_done():
+            self.is_done = True
+
+    def step_done(self):
+        return self.is_done
+
     
 class LSE_RemoveTarget(LevelScriptElement):
     def __init__(self,game_world,target):
@@ -176,3 +218,24 @@ class LSE_RemoveTarget(LevelScriptElement):
 
     def step_done(self):
         return self.is_done
+    
+class LSE_ChangeTextBoxVisibility(LevelScriptElement):
+    def __init__(self, game_world, target, visible: bool):
+        super().__init__(game_world)
+        self.target = target
+        self.visible = visible
+        self.is_done = False
+
+    def set_property(self, property_name, value):
+        if property_name == "target":
+            self.target = value
+            return True
+        return super().set_property(property_name, value)
+
+    def update(self, time_delta):
+        self.target.sprite_with_window.set_text_window_visibility(self.visible)        
+        self.is_done = True
+
+    def step_done(self):
+        return self.is_done
+    

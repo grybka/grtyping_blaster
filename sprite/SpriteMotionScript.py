@@ -1,4 +1,4 @@
-
+import math
 from game_world.Procedure import ProcedureStep
 from graphics.GraphicsBase import WorldSprite
 from sprite.SpriteWithTextWindow import SpriteWithTextWindow
@@ -162,3 +162,29 @@ class SMSE_RemoveSprite(SpriteMotionScriptElement):
         self.sprite.schedule_for_removal()
         self.is_done=True
         return True
+
+class SMSE_Wobble(SpriteMotionScriptElement):
+    def __init__(self, sprite: WorldSprite, amplitude_x: float, amplitude_y: float, frequency_x: float, frequency_y: float, duration: float):
+        super().__init__(sprite)
+        self.amplitude_x = amplitude_x
+        self.amplitude_y = amplitude_y
+        self.frequency_x = frequency_x
+        self.frequency_y = frequency_y
+        self.duration = duration
+        self.elapsed_time = 0
+
+    def start_step(self):
+        self.start_position = self.sprite.get_world_position(None)
+
+    def step_done(self):
+        return self.elapsed_time >= self.duration
+
+    def update(self, time_delta):
+        self.elapsed_time += time_delta
+        #if self.elapsed_time > self.duration:
+            #self.sprite.set_position(self.start_position)
+            #return
+        new_x = self.start_position[0] + self.amplitude_x * math.sin(2 * math.pi * self.frequency_x * self.elapsed_time)
+        new_y = self.start_position[1] + self.amplitude_y * math.sin(2 * math.pi * self.frequency_y * self.elapsed_time)
+        self.sprite.set_position((new_x, new_y))
+        

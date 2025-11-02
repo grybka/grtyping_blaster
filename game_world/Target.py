@@ -6,6 +6,8 @@ from sprite.SpriteWithTextWindow import SpriteWithTextWindow
 from sprite.SpriteMotionScript import SMSE_ChangeTextboxVisibility, SMSE_Wait, SMSE_MoveToPosition, SMSE_MoveToPosition_Smooth,SMSE_MoveToSprite
 from graphics.Graphics import Graphics
 from sprite.SpriteFactory import get_sprite_factory
+from sound.Sound import get_sound_store
+
 
 class Animation:
     # I need to decide whether this lives in graphics or world
@@ -79,15 +81,19 @@ class Target:
         if self.on_char < len(self.text):
             if self.text[self.on_char] == char:
                 self.correct_letter_typed()
+                #print("correct letter typed")
                 return True
             else:
                 self.incorrect_letter_typed()
+                #print("incorrect letter typed")
                 return False
+        
         return True
             
     def correct_letter_typed(self):
         self.on_char += 1
         self.sprite_with_window.text_window.correct_letter_typed()
+        get_sound_store().play_sound("laser")
         #Here is the shooting animation.  How to do this more generally?
         if self.on_char < len(self.text):
             shoot_anim=Animation()
@@ -107,24 +113,24 @@ class Target:
             self.animations.append(shoot_anim)
 
     def incorrect_letter_typed(self):
+        get_sound_store().play_sound("mistype")
         self.sprite_with_window.text_window.incorrect_letter_typed()
 
     def finalize(self):
         #called right before it will be removed
         self.sprite_with_window.scheduled_for_removal = True
-        #Death animation here
-        #same ship but shrinking
-        shrinker=ShrinkingSprite(self.sprite_with_window.sprite.image,world_position=self.sprite_with_window.position,angle=0,shrink_rate=1.0)
-        self.game_world.graphics.add_sprite(shrinker)
-        #explosion animation
-        exp_sprite=get_sprite_factory().create_animated_sprite("explosion1")
-        exp_sprite.end_on_last_frame=True
-        exp_sprite.position=self.sprite_with_window.position
-        self.game_world.graphics.add_sprite(exp_sprite)
-        
-
-
-
+        if not self.is_alive:
+            #Death animation here        
+            #same ship but shrinking
+            shrinker=ShrinkingSprite(self.sprite_with_window.sprite.image,world_position=self.sprite_with_window.position,angle=0,shrink_rate=1.0)
+            self.game_world.graphics.add_sprite(shrinker)
+            #explosion animation
+            exp_sprite=get_sprite_factory().create_animated_sprite("explosion1")
+            exp_sprite.end_on_last_frame=True
+            exp_sprite.position=self.sprite_with_window.position
+            self.game_world.graphics.add_sprite(exp_sprite)
+            #explosion sound
+            get_sound_store().play_sound("explosion")
 
     def update(self, time_delta):
         self.motion_script.update(time_delta)

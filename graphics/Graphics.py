@@ -16,6 +16,10 @@ class Graphics:
     def add_background(self, background):
         self.backgrounds.append(background) 
 
+    def update_background_property(self, property_name, property_value):
+        for background in self.backgrounds:
+            background.update_property(property_name, property_value)
+
     def draw(self,screen):
         self.screen_size = screen.get_size()
         screen.fill((0, 0, 0))
