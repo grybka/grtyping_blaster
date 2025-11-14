@@ -2,7 +2,7 @@ import pygame
 from game_state.GameManager import GameState, GameManagerBase
 from game_world.GameWorld import GameWorld
 from graphics.Graphics import Graphics
-from game_state.GameLevels import get_levelone_script
+from game_state.GameLevels import get_levelone_script, get_leveltwo_script
 from sound.Sound import get_sound_store
 
 class PlayGameLevel(GameState):
@@ -11,7 +11,8 @@ class PlayGameLevel(GameState):
         self.graphics = Graphics(screen)
         get_sound_store().load_sounds()
         self.world = GameWorld(self.graphics)
-        self.level_script = get_levelone_script(self.world)
+        #self.level_script = get_levelone_script(self.world)
+        self.level_script = get_leveltwo_script(self.world)
 
     def handle_event(self, event):
         if event.type==pygame.TEXTINPUT:

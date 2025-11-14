@@ -1,5 +1,6 @@
 from game_world.GameWorld import GameWorld
 from game_world.LevelScripting import LSE_ChangeTextBoxVisibility, LSE_EndLevel, LSE_PlayerWarpsAway, LSE_TargetShootPlayer, LSE_UpdateBackground, LSE_Wait, LSE_WaitForNoTargets, LSE_AddTarget, LSE_SetBackground, LSE_RemoveTarget
+from sprite.BackgroundParallax import BackgroundParallax
 from sprite.SpriteMotionScript import SMSE_MoveToPosition, SMSE_SetPosition, SMSE_MoveToPosition_Smooth, SMSE_Wobble
 from game_world.Procedure import Procedure, SimultaneousProcedureStep
 from sprite.TestCircle import TestCircle
@@ -121,4 +122,19 @@ def get_levelone_script(game_world: GameWorld):
     script.add_step(LSE_Wait(game_world, duration=0.25))
     script.add_step(LSE_PlayerWarpsAway(game_world, warp_position=(screen_size[0]//2, -200)))
     #script.add_step(LSE_EndLevel(game_world))
+    return script
+
+
+def get_leveltwo_script(game_world: GameWorld):
+    screen_size=game_world.graphics.screen_size
+    background_images=["data/parallax/forest/forest_sky.png",
+                       "data/parallax/forest/forest_mountain.png",
+                       "data/parallax/forest/forest_back.png",
+                       "data/parallax/forest/forest_mid.png",
+                       "data/parallax/forest/forest_long.png",
+                       "data/parallax/forest/forest_moon.png"]
+    parallax_factors=[0.05,0.2,0.4,0.6,1.0,0.0]
+    script=Procedure()
+    script.add_step(LSE_SetBackground(game_world,BackgroundParallax(background_images, parallax_factors=parallax_factors,velocity=1000)))
+    script.add_step(LSE_Wait(game_world, duration=10.0))
     return script
