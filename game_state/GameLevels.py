@@ -33,10 +33,29 @@ def get_levelone_script(game_world: GameWorld):
     hover_left_high=(screen_size[0]//4, screen_size[1]//3)
     hover_mid_high=(screen_size[0]//2, screen_size[1]//3)
     hover_right_high=(3*screen_size[0]//4, screen_size[1]//3)
-    def generate_motion_path(start_pos=None,hover_pos=None,leave_pos=None):
-        start_pos=start_pos or random.choice([left_low,left_high,right_low,right_high,top_left,top_mid,top_right,bottom_left,bottom_mid,bottom_right])
-        hover_pos=hover_pos or random.choice([hover_left_mid,hover_mid_mid,hover_right_mid,hover_left_high,hover_mid_high,hover_right_high])
-        leave_pos=leave_pos or random.choice([left_low,left_high,right_low,right_high,top_left,top_mid,top_right,bottom_left,bottom_mid,bottom_right])
+    def generate_path_positions(banned_positions=[]):
+        # Generate start, hover, and leave positions avoiding banned positions
+        start_choices=[left_low,left_high,right_low,right_high,top_left,top_mid,top_right,bottom_left,bottom_mid,bottom_right]
+        hover_choices=[hover_left_mid,hover_mid_mid,hover_right_mid,hover_left_high,hover_mid_high,hover_right_high]
+        leave_choices=[left_low,left_high,right_low,right_high,top_left,top_mid,top_right,bottom_left,bottom_mid,bottom_right]
+        start_pos=random.choice([pos for pos in start_choices if pos not in banned_positions])
+        hover_pos=random.choice([pos for pos in hover_choices if pos not in banned_positions])
+        leave_pos=random.choice([pos for pos in leave_choices if pos not in banned_positions])
+        return [start_pos, hover_pos, leave_pos]
+
+    def generate_multiple_path_positions(n_paths=1):
+        all_positions=[]
+        for _ in range(n_paths):
+            path_positions=generate_path_positions(banned_positions=[pos for sublist in all_positions for pos in sublist])
+            all_positions.append(path_positions)
+        return all_positions
+
+    def generate_motion_path(position=None,banned_positions=[]):
+        if position is None:
+            start_pos,hover_pos,leave_pos=generate_path_positions(banned_positions)        
+        else:
+            start_pos,hover_pos,leave_pos=position
+         #Now, create the motion script
         entry_duration=2.0
         exit_duration=2.0
         hover_duration=2.0        
@@ -88,11 +107,12 @@ def get_levelone_script(game_world: GameWorld):
     for i in range(5):
         script.add_step(add_target("short","ship2",generate_motion_path()))
         script.add_step(LSE_WaitForNoTargets(game_world))
-    for i in range(5):
+    for i in range(4):
         script.add_step(add_target("medium","ship2",generate_motion_path()))
         script.add_step(LSE_WaitForNoTargets(game_world))
-    for i in range(2):
-        script.add_step(add_target("medium","ship2",generate_motion_path()))
+    paths=generate_multiple_path_positions(n_paths=2)
+    for path in paths:
+        script.add_step(add_target("medium","ship2",generate_motion_path(position=path)))
     script.add_step(LSE_WaitForNoTargets(game_world))
         
     script.add_step(LSE_UpdateBackground(game_world, property_name="velocity", property_value=500))
