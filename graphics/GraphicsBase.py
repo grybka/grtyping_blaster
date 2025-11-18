@@ -26,37 +26,13 @@ class Camera:
 
 class Sprite:
     #base class for all sprites
-    def __init__(self, position=(0, 0)):
+    def __init__(self):
         # if the Sprite is a World Sprite, position in world coordinates of the center of the sprite
         # if the Sprite is a Screen Sprite, position in screen coordinates of the upper left of the sprite
-        self.position = position 
         self.scheduled_for_removal = False
 
     def schedule_for_removal(self):
         self.scheduled_for_removal = True
-
-    def set_position(self, position):
-        self.position = position
-
-    def get_screen_rect(self, camera):
-        # Returns the bounding box in screen coordinates as (x, y, width, height)
-        return (0,0,0,0)
-    
-    def set_world_position(self, position,camera):
-        # Sets the position in world coordinates
-        self.position = position
-
-    def set_screen_position(self, position,camera):
-        # Sets the position in screen coordinates
-        self.position = position
-
-    def get_screen_position(self, camera):
-        # Returns the position in screen coordinates as (x, y)
-        return (0,0)
-    
-    def get_world_position(self, camera):
-        # Returns the position in world coordinates as (x, y)
-        return (0,0)
 
     def draw(self, screen, camera):
         #TODO implement drawing logic using camera
@@ -72,34 +48,43 @@ class Sprite:
 class WorldSprite(Sprite):
     # A sprite that exists in world coordinates
     def __init__(self, position=(0, 0)):
-        super().__init__(position)
+        super().__init__()
+        self.position=position
 
     def set_screen_position(self, position,camera):
         # Sets the position in screen coordinates
         self.position = camera.screen_to_world(position)
 
-
     def get_screen_position(self, camera):
         # Returns the position in screen coordinates as (x, y)
         return camera.world_to_screen(self.position)
 
-    def get_world_position(self, camera):
+    def get_world_position(self):
         # Returns the position in world coordinates as (x, y)
         return self.position
+    
+    def set_world_position(self, position):
+        # Sets the position in world coordinates
+        self.position = position
     
 class ScreenSprite(Sprite):
     # A sprite that exists in screen coordinates
     def __init__(self, position=(0, 0), screen_wh=(0, 0)):
-        super().__init__(position)
+        super().__init__()
         self.screen_wh = screen_wh
+        self.position = position
 
     def get_screen_rect(self, camera):
         # Returns the bounding box in screen coordinates as (x, y, width, height)
         return (self.position[0], self.position[1], self.screen_wh[0], self.screen_wh[1])
 
-    def get_screen_position(self, camera):
+    def get_screen_position(self):
         # Returns the position in screen coordinates as (x, y)
         return self.position
+    
+    def set_screen_position(self, position):
+        # Sets the position in screen coordinates
+        self.position = position
 
     def get_world_position(self, camera):
         # Returns the position in world coordinates as (x, y)

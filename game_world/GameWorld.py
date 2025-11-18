@@ -1,14 +1,60 @@
+import copy
 from graphics.Graphics import Graphics
-from game_world.Target import Target
+#from game_world.Target import Target
 from sprite.SpriteFactory import get_sprite_factory
 from game_world.Procedure import Procedure
 from game_world.WorldProcedures import WP_PlayerDead, WP_Wait, WP_PlayAnimation, WP_PlaySound
 from sound.Sound import get_sound_store
 import random
+
+class WorldObject: #an object in the game world, usually drawn to the screen
+    def __init__(self,position=(0,0)):
+        self.motion_script=Procedure()
+        self.position=position        
+        #self.set_position(position)        
+
+    def get_sprites(self):
+        return []
+
+    def set_position(self, position):
+        self.position = position
+        for sprite in self.get_sprites():  
+            sprite.set_world_position(position)
+
+    def get_position(self):
+        return self.position
+
+    def update(self, time_delta):
+        self.motion_script.update(time_delta)        
+
+    def set_motion_script(self, motion_script: Procedure):
+        motion_script.set_property("object",self)
+        self.motion_script = motion_script
+
+    def schedule_for_removal(self):
+        pass
+
+    def check_should_remove(self):
+        return False
+    
+    def finalize(self):
+        #called before removal
+        pass
+
+    def is_targetable(self):
+        return False
+
 class GameWorld:
     def __init__(self,graphics: Graphics):
         self.graphics=graphics
+        self.player_object=None
+        self.default_player_script=None
+        self.world_objects=[]
+
+
+
         self.targets=[]
+        
         self.on_target=None
         self.player_health=100
         self.player_score=0
@@ -17,30 +63,52 @@ class GameWorld:
         self.player_alive=True
         self.player_sprite=None
         print("Game World initialized as ", self)
+        self.wait_for_keypress=False
 
-    def get_player_sprite(self):
-        return self.player_sprite
+    def add_player(self, player_object: WorldObject):
+        self.player_object=player_object
+        self.add_world_object(player_object)
 
-    def set_player_sprite(self,sprite):
-        self.player_sprite=sprite
-        print("screen position:", self.graphics.screen_size[0]//2, self.graphics.screen_size[1]-100)
-        self.player_sprite.set_screen_position((self.graphics.screen_size[0]//2, self.graphics.screen_size[1]-100),self.graphics.camera)       
-        self.graphics.add_sprite(sprite)
+    def set_default_player_script(self,motion_script: Procedure):
+        self.default_player_script=motion_script
 
-    def add_target(self,target: Target):
-        self.targets.append(target)
+    def add_world_object(self, world_object: WorldObject):
+        self.world_objects.append(world_object)
+        for sprite in world_object.get_sprites():
+            self.graphics.add_sprite(sprite)        
+
+    def add_target(self,target):        
+        self.add_world_object(target)
+
+    #def set_player_sprite(self,sprite):
+        #depricated        
+        #self.player_sprite=sprite
+        #print("screen position:", self.graphics.screen_size[0]//2, self.graphics.screen_size[1]-100)
+        #self.player_sprite.set_screen_position((self.graphics.screen_size[0]//4, self.graphics.screen_size[1]//2),self.graphics.camera)
+        #self.player_sprite.set_screen_position((self.graphics.screen_size[0]//2, self.graphics.screen_size[1]-100),self.graphics.camera)       
+        #self.graphics.add_sprite(sprite)
+
+    def get_targets(self,alive_only=True):
+        if not alive_only:
+            return [t for t in self.world_objects if t.is_targetable()]
+        return [t for t in self.world_objects if t.is_targetable() and t.is_alive]
 
     def add_procedure(self,procedure):
         self.procedures.append(procedure)
         self.some_bool=True
 
-    def text_typed(self,text):
+    def text_typed(self,text):    
+        if self.wait_for_keypress:
+            self.wait_for_keypress=False
+            return
+        targets=[ t for t in self.world_objects if t.is_targetable() and t.is_alive ]            
+        print("n targets available:", len(targets))
         if self.on_target is None:
             #figure out which to target
-            if len(self.targets)==1:
-                self.on_target=self.targets[0]
+            if len(targets)==1:
+                self.on_target=targets[0]
             else:
-                for target in self.targets:
+                for target in targets:
                     if target.is_alive and target.text.startswith(text):
                         self.on_target=target
                         break
@@ -54,19 +122,27 @@ class GameWorld:
             self.on_target=None
 
     def update(self, time_delta):
-        for target in self.targets:
-            target.update(time_delta)
-            if target.should_remove:
-                if self.on_target==target:
-                    self.on_target=None
-                target.finalize()
-                self.player_score+=len(target.text)
+        #update world objects (including player and targets)
+        for obj in self.world_objects:
+            obj.update(time_delta)
+        #check if player needs to be given default script
+        if self.player_object is not None and self.default_player_script is not None:
+            if self.player_object.motion_script.is_done():
+                #give default script
+                new_script=copy.deepcopy(self.default_player_script)
+                self.player_object.set_motion_script(new_script)            
+
+        #check objects for removal
+        for obj in self.world_objects:
+            if obj.check_should_remove():                
+                obj.finalize()
+        self.world_objects=[obj for obj in self.world_objects if not obj.check_should_remove()]
+        
         #update procedures
         for procedure in self.procedures:
             procedure.update(time_delta)
         self.procedures=[p for p in self.procedures if not p.is_done()]
-        #remove any completed targets
-        self.targets=[t for t in self.targets if not t.should_remove]
+        #remove any completed objects            
         self.graphics.overlay.player_health=self.player_health
         self.graphics.overlay.player_score=self.player_score
         #Make player explode if out of health
@@ -86,11 +162,15 @@ class GameWorld:
             self.player_alive=False
 
     def get_player_world_position(self):
-        return self.get_player_sprite().get_world_position(None)
+        return self.player_object.get_position()
+    
+    def damage_player(self, damage_amount):
+        self.player_health-=damage_amount
+        if self.player_health<0:
+            self.player_health=0
     
     def end_level(self):
         #Clean up the game world for ending the level
-        for target in self.targets:
-            target.finalize()
-        self.targets=[]
+        for object in self.world_objects:
+            object.finalize()        
         self.game_on=False

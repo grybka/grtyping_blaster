@@ -1,9 +1,11 @@
 import copy
 from game_world.GameWorld import GameWorld
+from game_world.ObjectScripting import MoveObjectToPosition_Smooth, WobbleObject
 from game_world.Procedure import Procedure, ProcedureStep
 from game_world.WorldProcedures import WP_DamagePlayer
 from sprite.SpriteMotionScript import SMSE_MoveToPosition, SMSE_MoveToPosition_Smooth, SMSE_MoveToSprite, SMSE_RemoveSprite, SMSE_SetPosition
 from sprite.TestCircle import TestCircle
+from sprite.CutsceneCommunication import CutsceneCommunication
 from sound.Sound import get_sound_store
 
 lev_debug=True
@@ -55,7 +57,8 @@ class LSE_WaitForNoTargets(LevelScriptElement):
         pass
 
     def step_done(self):
-        return len(self.game_world.targets) == 0
+        #alive_only=False to wait for all targets to be gone, there may be non alive targets finishing death animations
+        return len(self.game_world.get_targets(alive_only=False)) == 0
 
 class LSE_AddTarget(LevelScriptElement):
     def __init__(self, game_world, target, motion_script):
@@ -75,6 +78,42 @@ class LSE_AddTarget(LevelScriptElement):
     def step_done(self):
         return self.is_done
     
+class LSE_AddObject(LevelScriptElement):
+    def __init__(self, game_world, object, motion_script):
+        super().__init__(game_world)
+        self.object = object
+        self.object.set_motion_script(copy.deepcopy(motion_script))
+        self.is_done=False
+
+    def start_step(self):
+        self.object.start()
+        return super().start_step()
+
+    def update(self, time_delta):
+        self.game_world.add_world_object(self.object)
+        self.is_done=True
+
+    def step_done(self):
+        return self.is_done
+
+class LSE_AddTarget(LevelScriptElement):
+    def __init__(self, game_world, object, motion_script):
+        super().__init__(game_world)
+        self.object = object
+        self.object.set_motion_script(copy.deepcopy(motion_script))
+        self.is_done=False
+
+    def start_step(self):
+        self.object.start()
+        return super().start_step()
+
+    def update(self, time_delta):
+        self.game_world.add_target(self.object)
+        self.is_done=True
+
+    def step_done(self):
+        return self.is_done
+
 class LSE_AddBackgroundSprite(LevelScriptElement):
     def __init__(self, game_world, background):
         super().__init__(game_world)
@@ -178,28 +217,25 @@ class LSE_EndLevel(LevelScriptElement):
     def step_done(self):
         return self.is_done
     
-class LSE_PlayerWarpsAway(LevelScriptElement):
-    def __init__(self, game_world, warp_position):
+class LSE_SetPlayerMotionScript(LevelScriptElement):
+    def __init__(self, game_world, motion_script: Procedure):
         super().__init__(game_world)
-        self.warp_position = warp_position
+        self.motion_script = motion_script
         self.is_done = False
-        self.my_steps = None
 
     def update(self, time_delta):
-        if self.my_steps is None:
-            player_sprite = self.game_world.get_player_sprite()
-            self.my_steps = Procedure([
-                SMSE_MoveToPosition_Smooth(player_sprite,initial_position=None,initial_velocity=(0,0),final_velocity=(0,1000), final_position=self.warp_position, duration=2.0),                
-                LSE_EndLevel(self.game_world)
-            ])
-        self.my_steps.update(time_delta)
-        if self.my_steps.is_done():
-            self.is_done = True
+        self.game_world.player_object.set_motion_script(copy.deepcopy(self.motion_script))
+        self.is_done = True
 
     def step_done(self):
         return self.is_done
-
     
+class LSE_PlayerWarpsAway(LSE_SetPlayerMotionScript):
+    def __init__(self, game_world):
+        self.warp_position = (int(1.1 * game_world.graphics.screen_size[0]), game_world.graphics.screen_size[1] // 2)
+        self.motion_script = Procedure([MoveObjectToPosition_Smooth(end_position=self.warp_position,duration=2.0),WobbleObject(duration=10.0)])
+        super().__init__(game_world,motion_script=self.motion_script)
+            
 class LSE_RemoveTarget(LevelScriptElement):
     def __init__(self,game_world,target):
         super().__init__(game_world)
@@ -238,4 +274,3 @@ class LSE_ChangeTextBoxVisibility(LevelScriptElement):
 
     def step_done(self):
         return self.is_done
-    

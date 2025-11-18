@@ -46,11 +46,12 @@ class SimultaneousProcedureStep(ProcedureStep):
 
 
 class Procedure:
-    def __init__(self,steps=None):
+    def __init__(self,steps=None,is_loop=False):
         if steps is None:
             steps = []
         self.procedure_steps=steps
         self.on_step = -1
+        self.is_loop = is_loop
     
     def add_step(self,step: ProcedureStep):
         self.procedure_steps.append(step)
@@ -68,10 +69,13 @@ class Procedure:
                 self.on_step += 1
                 if self.on_step < len(self.procedure_steps):
                     self.procedure_steps[self.on_step].start_step()
+                elif self.is_loop:
+                    self.on_step = 0
+                    self.procedure_steps[0].start_step()
 
     def set_property(self, property_name, value):
         tf=[ step.set_property(property_name, value) for step in self.procedure_steps]
         return any(tf)
     
     def is_done(self):
-        return self.on_step >= len(self.procedure_steps)
+        return self.on_step >= len(self.procedure_steps) or len(self.procedure_steps)==0

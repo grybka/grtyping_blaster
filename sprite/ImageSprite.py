@@ -1,6 +1,6 @@
 import pygame
 import math
-from graphics.GraphicsBase import WorldSprite
+from graphics.GraphicsBase import ScreenSprite, WorldSprite
 
 class ImageSprite(WorldSprite):
     def __init__(self,image,world_position=(0,0),angle=0):
@@ -25,6 +25,32 @@ class ImageSprite(WorldSprite):
         screen_position = self.get_screen_position(camera)
         screen.blit(image,(screen_position[0]-image.get_width()/2,screen_position[1]-image.get_height()/2))
 
+    
+class ScreenImageSprite(ScreenSprite):
+    def __init__(self,image,screen_position=(0,0)):
+        super().__init__(self)        
+        self.image=image
+        self.position=screen_position
+        self.hidden=False
+
+    def set_screen_position(self, position):
+        self.position = position
+
+    def set_hidden(self,hidden):
+        self.hidden=hidden
+
+    def get_screen_rect(self, camera):
+        width=self.image.get_width()
+        height=self.image.get_height()
+        return (self.position[0],self.position[1],width,height)
+        
+    
+    def draw(self, screen, camera):
+        if self.hidden:
+            return  
+        image=self.image                
+        screen.blit(image,(self.position[0],self.position[1]))
+
 class AnimatedImageSprite(WorldSprite):
     #This is just like ImageSprite but it supports frame-based animation
     #It cycles through a list of images at a given frame duration
@@ -36,7 +62,7 @@ class AnimatedImageSprite(WorldSprite):
         self.current_time=0
         self.current_frame=0
         self.cyclic=True
-        self.end_on_last_frame=False
+        self.end_on_last_frame=True
 
     def update(self, time_delta):
         self.current_time+=time_delta
@@ -69,13 +95,15 @@ class AnimatedImageSprite(WorldSprite):
 
 class ShrinkingSprite(ImageSprite):
     #This is an ImageSprite that shrinks over time until it disappears
-    def __init__(self,image,world_position=(0,0),angle=0,shrink_rate=0.1):
+    def __init__(self,image,world_position=(0,0),angle=0,shrink_duration=1.):
         ImageSprite.__init__(self,image,world_position,angle)
-        self.shrink_rate=shrink_rate
+        self.shrink_duration=shrink_duration
         self.current_scale=1.0
+        self.elapsed_time=0
 
     def update(self, time_delta):
-        self.current_scale-=self.shrink_rate*time_delta
+        self.elapsed_time+=time_delta
+        self.current_scale=(1.0-self.elapsed_time/self.shrink_duration)        
         if self.current_scale<=0:
             self.scheduled_for_removal=True
 

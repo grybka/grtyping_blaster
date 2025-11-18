@@ -4,11 +4,19 @@ from graphics.GraphicsOverlay import GraphicsOverlay
 class Graphics:
     # Handles the background and various sprites to render to screen
     def __init__(self,screen):
+        self.screen=screen
         self.camera = Camera()
         self.overlay = GraphicsOverlay()
         self.sprites = []
         self.backgrounds = []
         self.screen_size = screen.get_size()
+        self.show_overlay = False
+        
+    def frac_to_screen(self, position):
+        # Convert a fractional position (0.0 to 1.0) to screen coordinates
+        x = int(position[0] * self.screen_size[0])
+        y = int(position[1] * self.screen_size[1])
+        return (x, y)
 
     def add_sprite(self, sprite):
         self.sprites.append(sprite)
@@ -29,8 +37,9 @@ class Graphics:
         # iterate through sprites, and draw each one
         for sprite in self.sprites:
             sprite.draw(screen, self.camera)
-        #draw the grahphics overlay last
-        self.overlay.draw(screen)
+        #draw the graphics overlay last
+        if self.show_overlay:
+            self.overlay.draw(screen)
 
     def update(self, time_delta):
         # Update all backgrounds

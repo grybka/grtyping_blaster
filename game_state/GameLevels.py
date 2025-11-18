@@ -1,18 +1,22 @@
+import game_world
 from game_world.GameWorld import GameWorld
-from game_world.LevelScripting import LSE_ChangeTextBoxVisibility, LSE_EndLevel, LSE_PlayerWarpsAway, LSE_TargetShootPlayer, LSE_UpdateBackground, LSE_Wait, LSE_WaitForNoTargets, LSE_AddTarget, LSE_SetBackground, LSE_RemoveTarget
-from sprite.BackgroundParallax import BackgroundParallax
+from game_world.LevelScripting import LSE_AddObject, LSE_ChangeTextBoxVisibility, LSE_EndLevel, LSE_PlayerWarpsAway, LSE_TargetShootPlayer, LSE_UpdateBackground, LSE_Wait, LSE_WaitForNoTargets, LSE_AddTarget, LSE_SetBackground, LSE_RemoveTarget
+from sprite.BackgroundParallax import BackgroundParallax, BackgroundParallaxStarField,load_background
 from sprite.SpriteMotionScript import SMSE_MoveToPosition, SMSE_SetPosition, SMSE_MoveToPosition_Smooth, SMSE_Wobble
 from game_world.Procedure import Procedure, SimultaneousProcedureStep
 from sprite.TestCircle import TestCircle
-from game_world.Target import Target
+from game_world.Target import ChargingTarget, Target, CutsceneTargetComms
 from sprite.Background import BackgroundStarField
 from sprite.SpriteFactory import SpriteFactory
 from game_state.TextFactory import TextFactory
 from sprite.SpriteFactory import get_sprite_factory
 from sprite.TextSprite import TextSprite
+from game_world.PlayerObject import PlayerObject
+from game_world.ObjectScripting import *
+
 import random
 
-def get_levelone_script(game_world: GameWorld):
+def get_levelzero_script(game_world: GameWorld):
     screen_size=game_world.graphics.screen_size
     offscreen=100
     #First, motion paths
@@ -124,17 +128,109 @@ def get_levelone_script(game_world: GameWorld):
     #script.add_step(LSE_EndLevel(game_world))
     return script
 
+#Entry motions for enemies
+def get_n_entry_motion_procedures(n_procs,entry_points=None, hold_points=None):
+    procs=[]
+    used_entry_points=[]
+    used_hold_points=[]
+    for _ in range(n_procs):
+        #select entry point
+        entry_point=random.choice([pt for pt in entry_points if pt not in used_entry_points])
+        used_entry_points.append(entry_point)
+        #select hold point
+        hold_point=random.choice([pt for pt in hold_points if pt not in used_hold_points])
+        used_hold_points.append(hold_point)
+        #create motion procedure
+        proc=Procedure([
+            SetObjectPosition(object=None, position=entry_point),
+            MoveObjectToPosition_Smooth(object=None, end_position=hold_point, duration=3.0),
+            WobbleObject(object=None, amplitude_x=10, amplitude_y=10, frequency_x=1.0, frequency_y=0.2, duration=-1.0)
+        ])
+        procs.append(proc)
+    return procs    
 
+def get_space_entry_points(graphics):
+    #Space entry points are anywhere from a 180 degree arc from the right of the screen
+    n_points=10
+    space_entry_points=[]
+    for i in range(n_points):
+        theta=math.pi*(i/(n_points-1)) - math.pi*0.5
+        x=0.5+0.6*math.cos(theta)
+        y=0.5+0.6*math.sin(theta)
+        space_entry_points.append( graphics.frac_to_screen((x,y)) )
+    #Space hold points are m rows and n columns in the center right of the screen
+    space_hold_points=[]
+    n_rows=3
+    n_columns=4
+    y_spacing=1.0/(n_rows+1)
+    for i in range(n_rows):
+        for j in range(n_columns):
+            x=0.5 + j*(0.9-0.5)/(n_columns-1)
+            y=y_spacing*(i+1)
+            space_hold_points.append( graphics.frac_to_screen((x,y)) )
+    return space_entry_points, space_hold_points
+
+#Level one: dodge asteroids
+def get_levelone_script(game_world: GameWorld):
+    screen_size=game_world.graphics.screen_size
+    space_entry_points, space_hold_points = get_space_entry_points(game_world.graphics)
+
+    sprite_factory=get_sprite_factory()
+
+
+    #TODO make default ship movement script
+    #game_world.set_player_sprite(sprite_factory.create_composite_sprite("ship6"))
+    playerobject=PlayerObject(sprite_factory.create_composite_sprite("ship1"), position=(100, 100))
+    playerscript=Procedure([
+        MoveObjectToPosition_Smooth(end_position=(200,200),duration=2.0),
+        MoveObjectToPosition_Smooth(end_position=(300,300),duration=2.0)
+    ],is_loop=True)
+    game_world.add_player(playerobject)
+    game_world.set_default_player_script(playerscript)
+    
+
+    #Then, the word factory
+    text_factory=TextFactory()
+    text_factory.load_text_category("letters","data/words/letters.txt")
+    text_factory.load_text_category("short", "data/short_words.txt")
+    text_factory.load_text_category("medium", "data/medium_words.txt")
+    text_factory.load_text_category("long", "data/long_words.txt")
+
+    
+    #down_and_hold_left=Procedure([
+    #    SetObjectPosition(position=(1500,500)),
+    #    WobbleObject(object=None,amplitude_x=10, amplitude_y=10, frequency_x=1.0, frequency_y=0.2, duration=-1.0)
+    #])
+
+    def add_n_targets(n_targets,textname,spritename):
+        steps=[]
+        entry_motions=get_n_entry_motion_procedures(n_targets,entry_points=space_entry_points, hold_points=space_hold_points)        
+        for i in range(n_targets):
+            text=text_factory.generate_random_text(textname)            
+            steps.append( LSE_AddTarget(game_world, object=ChargingTarget(text=text, game_world=game_world,object_sprite=sprite_factory.create_image_sprite(spritename)), motion_script=entry_motions[i]) )
+        return steps
+
+    #def add_target(textname,spritename,motionscript):
+    #    return LSE_AddTarget(game_world, object=ChargingTarget(text_factory.generate_random_text(textname), game_world=game_world,object_sprite=sprite_factory.create_image_sprite(spritename)), motion_script=motionscript)
+
+    script=Procedure()
+    #script.add_step(LSE_SetBackground(game_world,load_background("forest",velocity=500)))
+    script.add_step(LSE_SetBackground(game_world,load_background("space",velocity=500)))
+    #script.add_step(LSE_SetBackground(game_world,load_background("skies",velocity=500)))
+    script.add_step(LSE_AddTarget(game_world,object=CutsceneTargetComms(game_world=game_world,text="Theo, I spilled soda on my keyboard.  You need to avoid the asteroids!",character_image="portrait1"),motion_script=Procedure()))
+    script.add_step(LSE_WaitForNoTargets(game_world))
+    script.add_step(LSE_Wait(game_world, duration=1.0))
+    steps=add_n_targets(3,"letters","asteroid1")
+    for step in steps:
+        script.add_step(step)
+    script.add_step(LSE_WaitForNoTargets(game_world))
+    script.add_step(LSE_PlayerWarpsAway(game_world))
+    script.add_step(LSE_Wait(game_world, duration=2.0))
+    script.add_step(LSE_EndLevel(game_world))
+    
+    
+    return script
+
+#Level two: dodge missiles
 def get_leveltwo_script(game_world: GameWorld):
     screen_size=game_world.graphics.screen_size
-    background_images=["data/parallax/forest/forest_sky.png",
-                       "data/parallax/forest/forest_mountain.png",
-                       "data/parallax/forest/forest_back.png",
-                       "data/parallax/forest/forest_mid.png",
-                       "data/parallax/forest/forest_long.png",
-                       "data/parallax/forest/forest_moon.png"]
-    parallax_factors=[0.05,0.2,0.4,0.6,1.0,0.0]
-    script=Procedure()
-    script.add_step(LSE_SetBackground(game_world,BackgroundParallax(background_images, parallax_factors=parallax_factors,velocity=1000)))
-    script.add_step(LSE_Wait(game_world, duration=10.0))
-    return script

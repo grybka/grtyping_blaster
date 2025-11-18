@@ -1,14 +1,185 @@
 ship1:
+  type: "composite"
+  offset: [32,32]
+  starting_animation: "normal_flight"
+  components:
+    ship_body:
+      images:
+        - data\\ship_anim\\Ship1\\Ship1.png
+    ship_exhaust:
+      images:
+        - ["data\\ship_anim\\Ship1\\Exhaust\\Normal_flight\\Exhaust1\\exhaust1.png", [ -22, 16]]
+        - ["data\\ship_anim\\Ship1\\Exhaust\\Normal_flight\\Exhaust1\\exhaust2.png", [ -22, 16]]
+        - ["data\\ship_anim\\Ship1\\Exhaust\\Normal_flight\\Exhaust1\\exhaust3.png", [ -22, 16]]
+        - ["data\\ship_anim\\Ship1\\Exhaust\\Normal_flight\\Exhaust1\\exhaust4.png", [ -22, 16]]
+        - ["data\\ship_anim\\Ship1\\Exhaust\\Turbo_flight\\Exhaust1\\exhaust1.png", [ -48, 0]]
+        - ["data\\ship_anim\\Ship1\\Exhaust\\Turbo_flight\\Exhaust1\\exhaust2.png", [ -48, 0]]
+        - ["data\\ship_anim\\Ship1\\Exhaust\\Turbo_flight\\Exhaust1\\exhaust3.png", [ -48, 0]]
+        - ["data\\ship_anim\\Ship1\\Exhaust\\Turbo_flight\\Exhaust1\\exhaust4.png", [ -48, 0]]
+      animations:
+        normal_flight:
+          frames: [0,1,2,3]
+          frame_durations: [0.1,0.1,0.1,0.1]
+          loop: true        
+        turbo_flight:
+          frames: [4,5,6,7]
+          frame_durations: [0.1,0.1,0.1,0.1]
+          loop: true
+ship2:
+  type: "composite"
+  offset: [64,64]
+  starting_animation: "normal_flight"
+  components:
+    ship_body:
+      images:
+        - data\\ship_anim\\Ship2\\Ship2.png
+    ship_exhaust1:
+      images:
+        - ["data\\ship_anim\\Ship2\\Exhaust\\Normal_flight\\Exhaust1\\exhaust1.png", [ -2, 40]]
+        - ["data\\ship_anim\\Ship2\\Exhaust\\Normal_flight\\Exhaust1\\exhaust2.png", [ -2, 40]]
+        - ["data\\ship_anim\\Ship2\\Exhaust\\Normal_flight\\Exhaust1\\exhaust3.png", [ -2, 40]]
+        - ["data\\ship_anim\\Ship2\\Exhaust\\Normal_flight\\Exhaust1\\exhaust4.png", [ -2, 40]]
+        - ["data\\ship_anim\\Ship2\\Exhaust\\Turbo_flight\\Exhaust1\\exhaust1.png", [ -48, 0]]
+        - ["data\\ship_anim\\Ship2\\Exhaust\\Turbo_flight\\Exhaust1\\exhaust2.png", [ -48, 0]]
+        - ["data\\ship_anim\\Ship2\\Exhaust\\Turbo_flight\\Exhaust1\\exhaust3.png", [ -48, 0]]
+        - ["data\\ship_anim\\Ship2\\Exhaust\\Turbo_flight\\Exhaust1\\exhaust4.png", [ -48, 0]]
+      animations:
+        normal_flight:
+          frames: [0,1,2,3]
+          frame_durations: [0.1,0.1,0.1,0.1]
+          loop: true        
+        turbo_flight:
+          frames: [4,5,6,7]
+          frame_durations: [0.1,0.1,0.1,0.1]
+          loop: true
+    ship_exhaust2:
+      images:
+        - ["data\\ship_anim\\Ship2\\Exhaust\\Normal_flight\\Exhaust1\\exhaust1.png", [ -2, 54]]
+        - ["data\\ship_anim\\Ship2\\Exhaust\\Normal_flight\\Exhaust1\\exhaust2.png", [ -2, 54]]
+        - ["data\\ship_anim\\Ship2\\Exhaust\\Normal_flight\\Exhaust1\\exhaust3.png", [ -2, 54]]
+        - ["data\\ship_anim\\Ship2\\Exhaust\\Normal_flight\\Exhaust1\\exhaust4.png", [ -2, 54]]
+        - ["data\\ship_anim\\Ship2\\Exhaust\\Turbo_flight\\Exhaust1\\exhaust1.png", [ -48, 0]]
+        - ["data\\ship_anim\\Ship2\\Exhaust\\Turbo_flight\\Exhaust1\\exhaust2.png", [ -48, 0]]
+        - ["data\\ship_anim\\Ship2\\Exhaust\\Turbo_flight\\Exhaust1\\exhaust3.png", [ -48, 0]]
+        - ["data\\ship_anim\\Ship2\\Exhaust\\Turbo_flight\\Exhaust1\\exhaust4.png", [ -48, 0]]
+      animations:
+        normal_flight:
+          frames: [0,1,2,3]
+          frame_durations: [0.1,0.1,0.1,0.1]
+          loop: true        
+        turbo_flight:
+          frames: [4,5,6,7]
+          frame_durations: [0.1,0.1,0.1,0.1]
+          loop: true
+ship3:
+  type: "composite"
+  offset: [64,64]
+  starting_animation: "normal_flight"
+  components:
+    ship_body:
+      images:
+        - data\\ship_anim\\Ship3\\Ship3.png
+    ship_exhaust:
+      images:
+        - ["data\\ship_anim\\Ship3\\Exhaust\\Normal_flight\\Exhaust1\\exhaust1.png", [ -7, 48]]
+        - ["data\\ship_anim\\Ship3\\Exhaust\\Normal_flight\\Exhaust1\\exhaust2.png", [ -7, 48]]
+        - ["data\\ship_anim\\Ship3\\Exhaust\\Normal_flight\\Exhaust1\\exhaust3.png", [ -7, 48]]
+        - ["data\\ship_anim\\Ship3\\Exhaust\\Normal_flight\\Exhaust1\\exhaust4.png", [ -7, 48]]
+      animations:
+        normal_flight:
+          frames: [0,1,2,3]
+          frame_durations: [0.1,0.1,0.1,0.1]
+          loop: true           
+ship4:
+  type: "composite"
+  offset: [64,64]
+  starting_animation: "normal_flight"
+  components:
+    ship_body:
+      images:
+        - data\\ship_anim\\Ship4\\Ship4.png
+    ship_exhaust1:
+      images:
+        - ["data\\ship_anim\\Ship4\\Exhaust\\Normal_flight\\Exhaust1\\exhaust1.png", [ -14, 42]]
+        - ["data\\ship_anim\\Ship4\\Exhaust\\Normal_flight\\Exhaust1\\exhaust2.png", [ -14, 42]]
+        - ["data\\ship_anim\\Ship4\\Exhaust\\Normal_flight\\Exhaust1\\exhaust3.png", [ -14, 42]]
+        - ["data\\ship_anim\\Ship4\\Exhaust\\Normal_flight\\Exhaust1\\exhaust4.png", [ -14, 42]]
+      animations:
+        normal_flight:
+          frames: [0,1,2,3]
+          frame_durations: [0.1,0.1,0.1,0.1]
+          loop: true       
+    ship_exhaust2:
+      images:
+        - ["data\\ship_anim\\Ship4\\Exhaust\\Normal_flight\\Exhaust1\\exhaust1.png", [ -14, 58]]
+        - ["data\\ship_anim\\Ship4\\Exhaust\\Normal_flight\\Exhaust1\\exhaust2.png", [ -14, 58]]
+        - ["data\\ship_anim\\Ship4\\Exhaust\\Normal_flight\\Exhaust1\\exhaust3.png", [ -14, 58]]
+        - ["data\\ship_anim\\Ship4\\Exhaust\\Normal_flight\\Exhaust1\\exhaust4.png", [ -14, 58]]
+      animations:
+        normal_flight:
+          frames: [0,1,2,3]
+          frame_durations: [0.1,0.1,0.1,0.1]
+          loop: true     
+ship5:
+  type: "composite"
+  starting_animation: "normal_flight"
+  offset: [64,64]
+  components:
+    ship_body:
+      images:
+        - data\\ship_anim\\ship5\\Ship5.png
+    ship_exhaust:
+      images:
+        - ["data\\ship_anim\\ship5\\Exhaust\\Normal_flight\\Exhaust2\\exhaust1.png", [ -20, 55]]
+        - ["data\\ship_anim\\ship5\\Exhaust\\Normal_flight\\Exhaust2\\exhaust2.png", [ -20, 55]]
+        - ["data\\ship_anim\\ship5\\Exhaust\\Normal_flight\\Exhaust2\\exhaust3.png", [ -20, 55]]
+        - ["data\\ship_anim\\ship5\\Exhaust\\Normal_flight\\Exhaust2\\exhaust4.png", [ -20, 55]]
+      animations:
+        normal_flight:
+          frames: [0,1,2,3]
+          frame_durations: [0.1,0.1,0.1,0.1]
+          loop: true    
+ship6:
+  type: "composite"
+  starting_animation: "normal_flight"
+  offset: [64,64]
+  components:
+    ship_body:
+      images:
+        - data\\ship_anim\\Ship6\\Ship6.png
+    ship_exhaust1:
+      images:
+        - ["data\\ship_anim\\Ship6\\Exhaust\\Normal_flight\\Exhaust1\\exhaust1.png", [ -14, 29]]
+        - ["data\\ship_anim\\Ship6\\Exhaust\\Normal_flight\\Exhaust1\\exhaust2.png", [ -14, 29]]
+        - ["data\\ship_anim\\Ship6\\Exhaust\\Normal_flight\\Exhaust1\\exhaust3.png", [ -14, 29]]
+        - ["data\\ship_anim\\Ship6\\Exhaust\\Normal_flight\\Exhaust1\\exhaust4.png", [ -14, 29]]
+      animations:
+        normal_flight:
+          frames: [0,1,2,3]
+          frame_durations: [0.1,0.1,0.1,0.1]
+          loop: true       
+    ship_exhaust2:
+      images:
+        - ["data\\ship_anim\\Ship6\\Exhaust\\Normal_flight\\Exhaust1\\exhaust1.png", [ -14, 62]]
+        - ["data\\ship_anim\\Ship6\\Exhaust\\Normal_flight\\Exhaust1\\exhaust2.png", [ -14, 62]]
+        - ["data\\ship_anim\\Ship6\\Exhaust\\Normal_flight\\Exhaust1\\exhaust3.png", [ -14, 62]]
+        - ["data\\ship_anim\\Ship6\\Exhaust\\Normal_flight\\Exhaust1\\exhaust4.png", [ -14, 62]]
+      animations:
+        normal_flight:
+          frames: [0,1,2,3]
+          frame_durations: [0.1,0.1,0.1,0.1]
+          loop: true           
+ship4x:
   file: "data\\sprite_sheets\\destroyer.png"
   rect: [0, 0, 478, 348]
-  rotation: -90
+  rotation: 180
   scale: 0.25
-ship2:
+ship2x:
   file: "data\\sprite_sheets\\cruiser.png"
   rect: [0, 0, 397, 149]
   rotation: -90
   scale: 0.25
-ship3:
+ship3x:
   file: "data\\sprite_sheets\\Example_ships\\1B.png"
   scale: 0.75
 explosion1:
@@ -34,4 +205,18 @@ explosion1:
           [708,562,64,64],
           [642,938,64,64],
           [632,872,64,64]]
-  
+asteroid1:
+  file: "data\\sprite_sheets\\asteroids.png"
+  rect: [0, 0, 64, 64]
+planet1:
+  file: "data\\sprite_sheets\\planets_no_alpha\\b-1.png"  
+  scale: 0.25
+planet2:
+  file: "data\\sprite_sheets\\planets_no_alpha\\m-1.png"  
+  scale: 0.5
+planet3:
+  file: "data\\sprite_sheets\\planets_no_alpha\\rc-2.png"  
+  scale: 0.25
+portrait1:
+  file: "data\\sprite_sheets\\portraits\\portraits_1.png"
+  rect: [0, 0, 128, 128]

@@ -85,13 +85,13 @@ class TargetTextWindow(ScreenSprite):
         self.visible = True
         self.animations = []  # List of HitLetter animations
 
-    def set_position(self, position):
+    def set_screen_position(self, position):
         old_position = self.position
         delta_position = (position[0] - old_position[0], position[1] - old_position[1])
-        super().set_position(position)
+        super().set_screen_position(position)
         #update all animations by the same delta
         for anim in self.animations:
-            anim.set_position((anim.position[0] + delta_position[0], anim.position[1] + delta_position[1]))
+            anim.set_screen_position((anim.position[0] + delta_position[0], anim.position[1] + delta_position[1]))
 
 
     def correct_letter_typed(self):
@@ -132,6 +132,7 @@ class TargetTextWindow(ScreenSprite):
 
         # Draw the border and background of the text window
         border_color = (255, 255, 255)
+        screen.fill((0, 0, 0), self.get_screen_rect(camera))
         pygame.draw.rect(screen, border_color, self.get_screen_rect(camera), 2)
         # Draw the text with progress indication
         screen.blit(self.text_surface, (self.position[0]+self.margin, self.position[1]+self.margin))

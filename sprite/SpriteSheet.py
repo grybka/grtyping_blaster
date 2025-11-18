@@ -13,8 +13,7 @@ class SpriteSheet:
         if "rect" in info_object:
             rect = info_object["rect"]        
         return self.sheet_surface.subsurface(rect) 
-    
-    
+        
     
 class SpriteSheetStore:
     def __init__(self):
@@ -70,7 +69,7 @@ class SpriteSheetStore:
             ascale=self.sprite_info_file[sprite_name]["scale"]
             image=pygame.transform.scale(image,(int(image.get_width()*ascale),int(image.get_height()*ascale)))        
         self.loaded_sprites[sprite_name]=image
-        print("sprite {} scale {}".format(sprite_name,scale))
+        #print("sprite {} scale {}".format(sprite_name,scale))
         if scale==1:
             return image
         else:            

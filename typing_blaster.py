@@ -1,5 +1,7 @@
 import pygame
-from game_state.PlayGameLevel import PlayGameLevel,GameManager
+from game_state.LevelSelect import LevelSelectState
+#from game_state.PlayGameLevel import PlayGameLevel,GameManager
+from game_state.GameManager import GameManager
 
 pygame.init()
 pygame.font.init()
@@ -19,7 +21,8 @@ screen=pygame.display.set_mode(resolution,pygame.DOUBLEBUF | pygame.HWSURFACE)
 
 
 #set up game manager
-game_manager=GameManager(screen,PlayGameLevel(screen))
+#game_manager=GameManager(screen,PlayGameLevel(screen))
+game_manager=GameManager(screen,LevelSelectState(screen))
 
 running=True
 while running:
