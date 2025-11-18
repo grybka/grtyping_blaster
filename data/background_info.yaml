@@ -1,0 +1,43 @@
+forest:
+  images:
+    - "data\\parallax\\forest\\forest_sky.png"
+    - "data\\parallax\\forest\\forest_mountain.png"
+    - "data\\parallax\\forest\\forest_back.png"
+    - "data\\parallax\\forest\\forest_mid.png"
+    - "data\\parallax\\forest\\forest_long.png"
+    - "data\\parallax\\forest\\forest_moon.png"
+  parallax_factors: [0.05,0.2,0.4,0.6,1.0,0.0]
+desert:
+  images:
+    - "data\\parallax\\desert\\desert_sky.png"
+    - "data\\parallax\\desert\\desert_cloud.png"
+    - "data\\parallax\\desert\\desert_mountain.png"
+    - "data\\parallax\\desert\\desert_dunemid.png"
+    - "data\\parallax\\desert\\desert_dunefront.png"
+    - "data\\parallax\\desert\\desert_moon.png"
+  parallax_factors: [0.05,0.2,0.4,0.6,1.0,0.0]
+moon:
+  images:
+    - "data\\parallax\\moon\\moon_sky.png"
+    - "data\\parallax\\moon\\moon_earth.png"
+    - "data\\parallax\\moon\\moon_back.png"
+    - "data\\parallax\\moon\\moon_mid.png"
+    - "data\\parallax\\moon\\moon_front.png"
+    - "data\\parallax\\moon\\moon_floor.png"
+    
+  parallax_factors: [0.0,0.0,0.4,0.6,1.0,2.0]
+skies:
+  images:
+    - "data\\parallax\\skies\\Sky_sky.png"
+    - "data\\parallax\\skies\\Sky_moon.png"
+    - "data\\parallax\\skies\\Sky_clouds.png"
+    - "data\\parallax\\skies\\Sky_back_mountain.png"
+    - "data\\parallax\\skies\\Sky_cloud_single.png"
+    - "data\\parallax\\skies\\sky_front_mountain.png"
+    - "data\\parallax\\skies\\Sky_front_cloud.png"
+    - "data\\parallax\\skies\\sky_cloud_floor_2.png"
+    - "data\\parallax\\skies\\sky_cloud_floor.png"
+  parallax_factors: [0.0,0.0,0.05,0.1,0.2,0.25,0.3,0.5,1.0]
+
+space:
+  special: "star_field"
