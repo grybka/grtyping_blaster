@@ -191,3 +191,18 @@ class DamagePlayer(ObjectScriptStep):
         game_world = self.object.game_world
         game_world.damage_player(self.damage_amount)
         self.is_done_flag = True
+
+class StartTimer(ObjectScriptStep):
+    # This starts the timer on targets that have a timer
+    def __init__(self, time_amount: float, object: WorldObject=None):
+        super().__init__(object)
+        self.time_amount = time_amount
+        self.is_done_flag = False
+
+    def step_done(self):
+        return self.is_done_flag
+
+    def update(self, time_delta):
+        if not self.is_done_flag:
+            self.object.start_timer(self.time_amount)
+            self.is_done_flag = True

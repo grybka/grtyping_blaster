@@ -84,6 +84,15 @@ class TargetTextWindow(ScreenSprite):
         self.screen_wh = (surf_size[0] + 2 * self.margin, surf_size[1] + 2 * self.margin)
         self.visible = True
         self.animations = []  # List of HitLetter animations
+        # if I need to show a timer, it will be a green bar at the bottom of the text box that shrinks over time
+        self.show_timer = False
+        self.time_left = 5.0
+        self.total_time = 5.0
+
+    def update_timer(self, time_left, total_time):
+        self.show_timer = True
+        self.time_left = time_left
+        self.total_time = total_time
 
     def set_screen_position(self, position):
         old_position = self.position
@@ -131,12 +140,23 @@ class TargetTextWindow(ScreenSprite):
 
 
         # Draw the border and background of the text window
+        border_width = 2
         border_color = (255, 255, 255)
         screen.fill((0, 0, 0), self.get_screen_rect(camera))
-        pygame.draw.rect(screen, border_color, self.get_screen_rect(camera), 2)
+        pygame.draw.rect(screen, border_color, self.get_screen_rect(camera), border_width)
         # Draw the text with progress indication
         screen.blit(self.text_surface, (self.position[0]+self.margin, self.position[1]+self.margin))
         font = pygame.font.Font(None, 36)
+        # Draw the timer bar
+        if self.show_timer:
+            screen_rect=self.get_screen_rect(camera)            
+            timer_bar_width=screen_rect[2] - 2 * border_width
+            timer_bar_height = 10-border_width
+            time_ratio = max(self.time_left / self.total_time, 0)
+            current_bar_width = int(timer_bar_width * time_ratio)
+            timer_bar_rect = pygame.Rect(screen_rect[0]+border_width, screen_rect[1] + screen_rect[3] - timer_bar_height-border_width, current_bar_width, timer_bar_height)
+            pygame.draw.rect(screen, (0, 255, 0), timer_bar_rect)
+
         # Highlight the correctly typed portion
         if self.progress > 0:
             correct_text = self.text[:self.progress]

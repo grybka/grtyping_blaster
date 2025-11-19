@@ -17,7 +17,7 @@ class CutsceneCommunication(ScreenSprite):
         self.last_keystroke_time=0
         self.elapsed_time=0
         self.typing_error=0
-        self.error_probability=0.2
+        self.error_probability=0.1  #10% chance of error per character
         self.typed_text=""
 
     def set_position(self, position):

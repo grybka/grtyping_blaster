@@ -144,6 +144,7 @@ def get_n_entry_motion_procedures(n_procs,entry_points=None, hold_points=None):
         proc=Procedure([
             SetObjectPosition(object=None, position=entry_point),
             MoveObjectToPosition_Smooth(object=None, end_position=hold_point, duration=3.0),
+            StartTimer(time_amount=5.0, object=None),
             WobbleObject(object=None, amplitude_x=10, amplitude_y=10, frequency_x=1.0, frequency_y=0.2, duration=-1.0)
         ])
         procs.append(proc)
@@ -220,7 +221,7 @@ def get_levelone_script(game_world: GameWorld):
     script.add_step(LSE_AddTarget(game_world,object=CutsceneTargetComms(game_world=game_world,text="Theo, I spilled soda on my keyboard.  You need to avoid the asteroids!",character_image="portrait1"),motion_script=Procedure()))
     script.add_step(LSE_WaitForNoTargets(game_world))
     script.add_step(LSE_Wait(game_world, duration=1.0))
-    steps=add_n_targets(3,"letters","asteroid1")
+    steps=add_n_targets(3,"letters","debris1")
     for step in steps:
         script.add_step(step)
     script.add_step(LSE_WaitForNoTargets(game_world))

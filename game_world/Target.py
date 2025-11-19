@@ -172,6 +172,27 @@ class ChargingTarget(Target):
         super().__init__(text, game_world,motion_script,object_sprite)
         self.hit_player=False
         self.is_alive=True #willing to accept input
+        self.has_timer=False
+        self.elapsed_time=0
+        self.time_limit=5.0
+        self.timer_started=False
+
+    def start_timer(self,time_limit):
+        self.has_timer=True
+        self.timer_started=True
+        self.elapsed_time=0
+        self.time_limit=time_limit
+
+    def update(self, time_delta):
+        super().update(time_delta)
+        if self.has_timer and self.timer_started:
+            self.elapsed_time += time_delta
+            self.sprite_with_window.text_window.update_timer(self.time_limit - self.elapsed_time, self.time_limit)
+            if self.elapsed_time > self.time_limit:
+                #time's up
+                self.unsuccessful_completion()
+                self.timer_started=False
+
 
     def finalize(self):
         #called right before it will be removed
