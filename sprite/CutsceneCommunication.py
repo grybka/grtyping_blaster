@@ -32,7 +32,7 @@ class CutsceneCommunication(ScreenSprite):
         #self.text_box.set_text(text)    
 
     def update(self, time_delta):        
-        typing_speed=5  #characters per second
+        typing_speed=7  #characters per second
         typing_rate=1/typing_speed
         self.elapsed_time += time_delta
         if self.typed_text == self.my_text:

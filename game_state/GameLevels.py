@@ -129,7 +129,7 @@ def get_levelzero_script(game_world: GameWorld):
     return script
 
 #Entry motions for enemies
-def get_n_entry_motion_procedures(n_procs,entry_points=None, hold_points=None):
+def get_n_entry_motion_procedures(n_procs,entry_points=None, hold_points=None,time_limit=-1):
     procs=[]
     used_entry_points=[]
     used_hold_points=[]
@@ -143,8 +143,8 @@ def get_n_entry_motion_procedures(n_procs,entry_points=None, hold_points=None):
         #create motion procedure
         proc=Procedure([
             SetObjectPosition(object=None, position=entry_point),
-            MoveObjectToPosition_Smooth(object=None, end_position=hold_point, duration=3.0),
-            StartTimer(time_amount=5.0, object=None),
+            MoveObjectToPosition_Smooth(object=None, end_position=hold_point, duration=2.0),
+            StartTimer(time_amount=time_limit, object=None),
             WobbleObject(object=None, amplitude_x=10, amplitude_y=10, frequency_x=1.0, frequency_y=0.2, duration=-1.0)
         ])
         procs.append(proc)
@@ -197,31 +197,57 @@ def get_levelone_script(game_world: GameWorld):
     text_factory.load_text_category("medium", "data/medium_words.txt")
     text_factory.load_text_category("long", "data/long_words.txt")
 
-    
-    #down_and_hold_left=Procedure([
-    #    SetObjectPosition(position=(1500,500)),
-    #    WobbleObject(object=None,amplitude_x=10, amplitude_y=10, frequency_x=1.0, frequency_y=0.2, duration=-1.0)
-    #])
-
-    def add_n_targets(n_targets,textname,spritename):
+    def add_n_targets(n_targets,textname,spritenames,time_limit=-1):                            
         steps=[]
-        entry_motions=get_n_entry_motion_procedures(n_targets,entry_points=space_entry_points, hold_points=space_hold_points)        
+        entry_motions=get_n_entry_motion_procedures(n_targets,entry_points=space_entry_points, hold_points=space_hold_points,time_limit=time_limit)        
         for i in range(n_targets):
+            if isinstance(spritenames,str):
+                spritename=spritenames[0]
+            else:
+                spritename=random.choice(spritenames)
             text=text_factory.generate_random_text(textname)            
             steps.append( LSE_AddTarget(game_world, object=ChargingTarget(text=text, game_world=game_world,object_sprite=sprite_factory.create_image_sprite(spritename)), motion_script=entry_motions[i]) )
         return steps
 
-    #def add_target(textname,spritename,motionscript):
-    #    return LSE_AddTarget(game_world, object=ChargingTarget(text_factory.generate_random_text(textname), game_world=game_world,object_sprite=sprite_factory.create_image_sprite(spritename)), motion_script=motionscript)
-
+    debris_sprites=["debris1","debris2","debris3","debris4","debris5","debris6","debris7","debris8","debris9"]
     script=Procedure()
     #script.add_step(LSE_SetBackground(game_world,load_background("forest",velocity=500)))
     script.add_step(LSE_SetBackground(game_world,load_background("space",velocity=500)))
     #script.add_step(LSE_SetBackground(game_world,load_background("skies",velocity=500)))
-    script.add_step(LSE_AddTarget(game_world,object=CutsceneTargetComms(game_world=game_world,text="Theo, I spilled soda on my keyboard.  You need to avoid the asteroids!",character_image="portrait1"),motion_script=Procedure()))
+    script.add_step(LSE_AddTarget(game_world,object=CutsceneTargetComms(game_world=game_world,text="Theo, I spilled soda on my keyboard.  You need to avoid the space debris!",character_image="portrait1"),motion_script=Procedure()))
     script.add_step(LSE_WaitForNoTargets(game_world))
     script.add_step(LSE_Wait(game_world, duration=1.0))
-    steps=add_n_targets(3,"letters","debris1")
+    for i in range(4):
+        script.add_step(add_n_targets(1,"letters",debris_sprites)[0])
+        script.add_step(LSE_WaitForNoTargets(game_world))
+    for i in range(2):
+        steps=add_n_targets(2,"letters",debris_sprites)
+        for step in steps:
+            script.add_step(step)
+        script.add_step(LSE_WaitForNoTargets(game_world))
+    script.add_step(LSE_AddTarget(game_world,object=CutsceneTargetComms(game_world=game_world,text="They're coming faster!  You'll have to type quickly!",character_image="portrait1"),motion_script=Procedure()))
+    script.add_step(LSE_WaitForNoTargets(game_world))    
+    steps=add_n_targets(2,"letters",debris_sprites,time_limit=5.0)
+    for step in steps:
+        script.add_step(step)
+    script.add_step(LSE_WaitForNoTargets(game_world))
+    steps=add_n_targets(2,"letters",debris_sprites,time_limit=4.0)
+    for step in steps:
+        script.add_step(step)
+    script.add_step(LSE_WaitForNoTargets(game_world))
+    steps=add_n_targets(3,"letters",debris_sprites,time_limit=4.0)
+    for step in steps:
+        script.add_step(step)
+    script.add_step(LSE_WaitForNoTargets(game_world))
+    steps=add_n_targets(3,"letters",debris_sprites,time_limit=2.0)
+    for step in steps:
+        script.add_step(step)
+    script.add_step(LSE_WaitForNoTargets(game_world))    
+    steps=add_n_targets(3,"letters",debris_sprites,time_limit=2.0)
+    for step in steps:
+        script.add_step(step)
+    script.add_step(LSE_WaitForNoTargets(game_world))    
+    steps=add_n_targets(3,"letters",debris_sprites,time_limit=1.0)
     for step in steps:
         script.add_step(step)
     script.add_step(LSE_WaitForNoTargets(game_world))

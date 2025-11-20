@@ -82,6 +82,11 @@ class Target(WorldObject):
         for sprite in self.get_sprites():  
             sprite.set_position(position)
 
+    def accepts_text(self, char):
+        if self.text[0]==char:
+            return True
+        return False
+
     def text_typed(self, char):
         if self.on_char < len(self.text):
             if self.text[self.on_char] == char:
@@ -168,13 +173,13 @@ class Target(WorldObject):
 
 class ChargingTarget(Target):
     # A target that charges the player on completion
-    def __init__(self, text, game_world,motion_script: Procedure=None,object_sprite=None):
+    def __init__(self, text, game_world,motion_script: Procedure=None,object_sprite=None,time_limit=-1):
         super().__init__(text, game_world,motion_script,object_sprite)
         self.hit_player=False
         self.is_alive=True #willing to accept input
         self.has_timer=False
         self.elapsed_time=0
-        self.time_limit=5.0
+        self.time_limit=time_limit
         self.timer_started=False
 
     def start_timer(self,time_limit):
@@ -185,7 +190,7 @@ class ChargingTarget(Target):
 
     def update(self, time_delta):
         super().update(time_delta)
-        if self.has_timer and self.timer_started:
+        if self.has_timer and self.timer_started and self.time_limit>0 and self.is_alive:
             self.elapsed_time += time_delta
             self.sprite_with_window.text_window.update_timer(self.time_limit - self.elapsed_time, self.time_limit)
             if self.elapsed_time > self.time_limit:
@@ -235,7 +240,7 @@ class ChargingTarget(Target):
             dodge_loc=(player_position[0],player_position[1]+dodge_by)
         if dodge_loc[1]>self.game_world.graphics.screen_size[1]-50:
             dodge_loc=(player_position[0],player_position[1]-dodge_by)
-        print("Impact loc: {}, Dodge loc: {}, Target exit loc: {}".format(player_position, dodge_loc, exit_loc))
+        #print("Impact loc: {}, Dodge loc: {}, Target exit loc: {}".format(player_position, dodge_loc, exit_loc))
         #set player motion script to dodge
         dodge_script=Procedure([MoveObjectToPosition_Smooth(end_position=dodge_loc,duration=impact_time)])
         self.game_world.player_object.set_motion_script(dodge_script)
@@ -286,6 +291,9 @@ class CutsceneTargetComms(Target):
 
     def start(self):
         self.graphics.add_sprite(self.sprite_with_window)
+
+    def accepts_text(self, char):
+        return True
 
     def text_typed(self, char):
         self.successful_completion()

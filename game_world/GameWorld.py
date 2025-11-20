@@ -102,14 +102,14 @@ class GameWorld:
             self.wait_for_keypress=False
             return
         targets=[ t for t in self.world_objects if t.is_targetable() and t.is_alive ]            
-        print("n targets available:", len(targets))
+        #print("n targets available:", len(targets))
         if self.on_target is None:
             #figure out which to target
             if len(targets)==1:
                 self.on_target=targets[0]
             else:
                 for target in targets:
-                    if target.is_alive and target.text.startswith(text):
+                    if target.is_alive and target.accepts_text(text):
                         self.on_target=target
                         break
                 if self.on_target is None:
