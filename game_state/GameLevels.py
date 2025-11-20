@@ -171,7 +171,7 @@ def get_space_entry_points(graphics):
             space_hold_points.append( graphics.frac_to_screen((x,y)) )
     return space_entry_points, space_hold_points
 
-#Level one: dodge asteroids
+#Level one: dodge debris
 def get_levelone_script(game_world: GameWorld):
     screen_size=game_world.graphics.screen_size
     space_entry_points, space_hold_points = get_space_entry_points(game_world.graphics)

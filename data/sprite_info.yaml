@@ -223,4 +223,27 @@ portrait1:
 debris1:
   file: "data\\sprite_sheets\\clutter_2.png"
   rect: [0, 0, 128, 128]
-          
+debris2:
+  file: "data\\sprite_sheets\\clutter_2.png"
+  rect: [128, 0, 128, 128]
+debris3:
+  file: "data\\sprite_sheets\\clutter_2.png"
+  rect: [256, 0, 128, 128]
+debris4:
+  file: "data\\sprite_sheets\\clutter_2.png"
+  rect: [0, 128, 128, 128]
+debris5:
+  file: "data\\sprite_sheets\\clutter_2.png"
+  rect: [128, 128, 128, 128]
+debris6:
+  file: "data\\sprite_sheets\\clutter_2.png"
+  rect: [256, 128, 128, 128]
+debris7:
+  file: "data\\sprite_sheets\\clutter_2.png"
+  rect: [0, 256, 128, 128]
+debris8:
+  file: "data\\sprite_sheets\\clutter_2.png"
+  rect: [128, 256, 128, 128]  
+debris9:
+  file: "data\\sprite_sheets\\clutter_2.png"
+  rect: [256, 256, 128, 128]
