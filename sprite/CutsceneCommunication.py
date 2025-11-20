@@ -31,6 +31,13 @@ class CutsceneCommunication(ScreenSprite):
         self.elapsed_time=0
         #self.text_box.set_text(text)    
 
+    def finish_text(self): #skips ahead to the end of the text
+        self.typed_text=self.my_text
+        self.text_box.set_text(self.typed_text)
+
+    def is_finished(self):
+        return self.typed_text == self.my_text
+
     def update(self, time_delta):        
         typing_speed=7  #characters per second
         typing_rate=1/typing_speed

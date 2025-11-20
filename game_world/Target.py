@@ -296,6 +296,9 @@ class CutsceneTargetComms(Target):
         return True
 
     def text_typed(self, char):
+        if not self.sprite_with_window.is_finished():
+            self.sprite_with_window.finish_text()
+            return True
         self.successful_completion()
         return True
     

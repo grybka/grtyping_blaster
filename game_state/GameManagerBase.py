@@ -11,6 +11,10 @@ class GameState: #abstract base class
     def __init__(self):
         ...
 
+    def start(self):
+        #called when it first starts updating
+        ...
+
     def handle_event(self, event):
         ...
 

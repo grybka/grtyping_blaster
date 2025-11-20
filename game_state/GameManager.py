@@ -27,6 +27,7 @@ class FadeCutState(GameState):
                 self.alpha=255
                 self.fade_in=False
                 self.fade_out=True
+                self.next_state.start()
                 self.next_state.update(time_delta)  #ensure next state gets updated at least once
         elif self.fade_out:
             self.next_state.update(time_delta)
@@ -80,6 +81,7 @@ class GameManager(GameManagerBase):
             if status.new_state=="LevelSelectState":
                 #self.on_game_state=LevelSelectState(self.screen)                                
                 self.on_game_state=FadeCutState(self.screen,LevelSelectState(self.screen))
+            self.on_game_state.start()
 
         #if status=="LevelDone":
         ##    score=self.on_game_state.world.player_score

@@ -14,6 +14,9 @@ class PlayGameLevel(GameState):
         #self.level_script = get_levelone_script(self.world)
         self.level_script = get_levelone_script(self.world)
 
+    def start(self):
+        self.graphics.show_overlay=True
+
     def handle_event(self, event):
         if event.type==pygame.TEXTINPUT:
             #event.text contains the character typed

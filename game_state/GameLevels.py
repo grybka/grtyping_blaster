@@ -171,6 +171,27 @@ def get_space_entry_points(graphics):
             space_hold_points.append( graphics.frac_to_screen((x,y)) )
     return space_entry_points, space_hold_points
 
+#Level zero: Cutscene.  Your ship is destroyed by the alphabeticons
+def get_levelzero_script(game_world: GameWorld):
+    script=Procedure()
+    script.add_step(LSE_SetBackground(game_world,load_background("space",velocity=200)))
+    # Narrator: Somewhere in deep space
+    # Enter: a big ship
+    # Enter: alphabeticons
+    # Alphabeticons:  We are the alphabeticons.  You have no chance to survive.
+    # Captain: Alphabeticons?? What you say?
+    # alphabeticons start shooting
+    # Captain: To the escape pods!
+
+
+
+
+    script.add_step(LSE_AddTarget(game_world,object=CutsceneTargetComms(game_world=game_world,text="Captain Theo, your ship has been destroyed by the Alphabeticons!  We need you to type fast to survive!",character_image="portrait2"),motion_script=Procedure()))
+    script.add_step(LSE_WaitForNoTargets(game_world))
+    script.add_step(LSE_Wait(game_world, duration=1.0))
+    script.add_step(LSE_EndLevel(game_world))
+    return script
+
 #Level one: dodge debris
 def get_levelone_script(game_world: GameWorld):
     screen_size=game_world.graphics.screen_size
@@ -214,7 +235,7 @@ def get_levelone_script(game_world: GameWorld):
     #script.add_step(LSE_SetBackground(game_world,load_background("forest",velocity=500)))
     script.add_step(LSE_SetBackground(game_world,load_background("space",velocity=500)))
     #script.add_step(LSE_SetBackground(game_world,load_background("skies",velocity=500)))
-    script.add_step(LSE_AddTarget(game_world,object=CutsceneTargetComms(game_world=game_world,text="Theo, I spilled soda on my keyboard.  You need to avoid the space debris!",character_image="portrait1"),motion_script=Procedure()))
+    script.add_step(LSE_AddTarget(game_world,object=CutsceneTargetComms(game_world=game_world,text="Theo, you need to avoid the space debris!  If they knock out your shields, you're doomed",character_image="portrait1"),motion_script=Procedure()))
     script.add_step(LSE_WaitForNoTargets(game_world))
     script.add_step(LSE_Wait(game_world, duration=1.0))
     for i in range(4):
