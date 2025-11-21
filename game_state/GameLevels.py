@@ -1,6 +1,6 @@
 import game_world
 from game_world.GameWorld import GameWorld
-from game_world.LevelScripting import LSE_AddObject, LSE_ChangeTextBoxVisibility, LSE_EndLevel, LSE_PlayerWarpsAway, LSE_TargetShootPlayer, LSE_UpdateBackground, LSE_Wait, LSE_WaitForNoTargets, LSE_AddTarget, LSE_SetBackground, LSE_RemoveTarget
+from game_world.LevelScripting import LSE_AddObject, LSE_ChangeTextBoxVisibility, LSE_EndLevel, LSE_PlayerWarpsAway, LSE_SetPlayerMotionScript, LSE_TargetShootPlayer, LSE_UpdateBackground, LSE_Wait, LSE_WaitForNoTargets, LSE_AddTarget, LSE_SetBackground, LSE_RemoveTarget
 from sprite.BackgroundParallax import BackgroundParallax, BackgroundParallaxStarField,load_background
 from sprite.SpriteMotionScript import SMSE_MoveToPosition, SMSE_SetPosition, SMSE_MoveToPosition_Smooth, SMSE_Wobble
 from game_world.Procedure import Procedure, SimultaneousProcedureStep
@@ -13,6 +13,7 @@ from sprite.SpriteFactory import get_sprite_factory
 from sprite.TextSprite import TextSprite
 from game_world.PlayerObject import PlayerObject
 from game_world.ObjectScripting import *
+from game_world.SceneObjects import SceneObject
 
 import random
 
@@ -173,22 +174,64 @@ def get_space_entry_points(graphics):
 
 #Level zero: Cutscene.  Your ship is destroyed by the alphabeticons
 def get_levelzero_script(game_world: GameWorld):
+    screen_size=game_world.graphics.screen_size
+    helm_text_position=(screen_size[0]//4, screen_size[1]//4)
+    alien_text_position=(2*screen_size[0]//3, screen_size[1]//4)
+    captain_text_position=(screen_size[0]//4, 3*screen_size[1]//4)
     script=Procedure()
     script.add_step(LSE_SetBackground(game_world,load_background("space",velocity=200)))
     # Narrator: Somewhere in deep space
+    script.add_step(LSE_AddTarget(game_world,object=CutsceneTargetComms(game_world=game_world,text="Somewhere in deep space...",character_image="hdf1",typing_speed=10),motion_script=Procedure()))
     # Enter: a big ship
-    # Enter: alphabeticons
-    # Alphabeticons:  We are the alphabeticons.  You have no chance to survive.
-    # Captain: Alphabeticons?? What you say?
-    # alphabeticons start shooting
-    # Captain: To the escape pods!
+    ship=SceneObject(sprite=get_sprite_factory().create_image_sprite("ship_carrier"), position=(game_world.graphics.screen_size[0]//2, -200))
 
-
-
-
-    script.add_step(LSE_AddTarget(game_world,object=CutsceneTargetComms(game_world=game_world,text="Captain Theo, your ship has been destroyed by the Alphabeticons!  We need you to type fast to survive!",character_image="portrait2"),motion_script=Procedure()))
+    ship_script=Procedure([
+        SetObjectPosition(object=None, position=(-100, screen_size[1]//2)),
+        MoveObjectToPosition_Smooth(object=None, end_position=(screen_size[0]//3, screen_size[1]//2), duration=2.0),
+        WobbleObject(object=None, amplitude_x=5, amplitude_y=5, frequency_x=1.0, frequency_y=0.5, duration=-1.0)
+    ])
+    script.add_step(LSE_AddObject(game_world, object=ship, motion_script=ship_script))
     script.add_step(LSE_WaitForNoTargets(game_world))
-    script.add_step(LSE_Wait(game_world, duration=1.0))
+    # Enter: alphabeticons
+    ship2=SceneObject(sprite=get_sprite_factory().create_image_sprite("ship_a1"))
+    script.add_step(LSE_AddTarget(game_world,object=CutsceneTargetComms(position=helm_text_position,game_world=game_world,text="There is something on our scanners...",character_image="portrait2",typing_speed=10,speaker_name="Helm Officer"),motion_script=Procedure()))
+    ship2_script=Procedure([
+        SetObjectPosition(object=None, position=(screen_size[0]+100, screen_size[1]//2)),
+        MoveObjectToPosition_Smooth(object=None, end_position=(screen_size[0]*2//3, screen_size[1]//2), duration=2.0),
+        WobbleObject(object=None, amplitude_x=5, amplitude_y=5, frequency_x=1.0, frequency_y=0.5, duration=-1.0)
+    ])
+    script.add_step(LSE_AddObject(game_world, object=ship2, motion_script=ship2_script))
+    script.add_step(LSE_WaitForNoTargets(game_world))
+    # Alphabeticons:  We are the alphabeticons.  You have no chance to survive.
+    script.add_step(LSE_AddTarget(game_world,object=CutsceneTargetComms(position=alien_text_position, game_world=game_world,text="We are the alphabeticons.  Earth is doomed.  We will hack autocorrect to make your text messages unreadable.",character_image="alphabet",typing_speed=10),motion_script=Procedure()))    
+    script.add_step(LSE_WaitForNoTargets(game_world))
+    # alphabeticons start shooting
+    for i in range(4):
+        shot=SceneObject(sprite=get_sprite_factory().create_composite_sprite("shot1"))    
+        shot_script=Procedure([
+            SetObjectPositionToOtherObject(object=None, target=ship2),
+            MoveObjectToObject(target_object=ship, duration=2.0),
+            SpawnSpriteAtObject(sprite=get_sprite_factory().create_animated_sprite("explosion1"), graphics=game_world.graphics),
+            DespawnSelfObject()
+        ])
+        script.add_step(LSE_AddObject(game_world, object=shot, motion_script=shot_script))
+        script.add_step(LSE_Wait(game_world, duration=0.5))
+    # Captain: Alphabeticons?? What you say?
+    script.add_step(LSE_AddTarget(game_world,object=CutsceneTargetComms(position=captain_text_position,game_world=game_world,text="Never!  Fire back!",character_image="portrait1",typing_speed=10),motion_script=Procedure()))
+    script.add_step(LSE_WaitForNoTargets(game_world))
+    script.add_step(LSE_AddTarget(game_world,object=CutsceneTargetComms(position=helm_text_position,game_world=game_world,text="Oh No!  I spilled soda on the keyboard.  We're helpless!",character_image="portrait2",typing_speed=7,typing_error_rate=0.15),motion_script=Procedure()))
+    script.add_step(LSE_WaitForNoTargets(game_world))
+    script.add_step(LSE_AddTarget(game_world,object=CutsceneTargetComms(position=captain_text_position,game_world=game_world,text="Abandon ship!  Captain Theo, you must escape and save Earth!",character_image="portrait1",typing_speed=10),motion_script=Procedure()))
+    script.add_step(LSE_WaitForNoTargets(game_world))
+    # Captain: To the escape pods!
+    pod=SceneObject(sprite=get_sprite_factory().create_composite_sprite("ship1"), position=(game_world.graphics.screen_size[0]//2, screen_size[1]+200))
+    pod_script=Procedure([
+        SetObjectPositionToOtherObject(target=ship),
+        MoveObjectToPosition_Smooth(object=None, end_position=(screen_size[0]*2//3, int(screen_size[1]*1.05)), duration=2.0),
+        ])
+    script.add_step(LSE_AddObject(game_world, object=pod, motion_script=pod_script))
+    script.add_step(SpawnSpriteAtObject(object=ship,sprite=get_sprite_factory().create_animated_sprite("explosion1"), graphics=game_world.graphics))    
+    script.add_step(LSE_Wait(game_world, duration=2.0))
     script.add_step(LSE_EndLevel(game_world))
     return script
 
@@ -272,13 +315,32 @@ def get_levelone_script(game_world: GameWorld):
     for step in steps:
         script.add_step(step)
     script.add_step(LSE_WaitForNoTargets(game_world))
-    script.add_step(LSE_PlayerWarpsAway(game_world))
+    #Players ship crashes on moon
+    moon_sprite=sprite_factory.create_image_sprite("planet_moon")
+    moon_object=SceneObject(sprite=moon_sprite)
+    moon_script=Procedure([
+        SetObjectPosition(object=None, position=(screen_size[0]//2, screen_size[1]//2 + 200)),
+        MoveObjectToPosition(object=None, end_position=(screen_size[0]//2, screen_size[1]//2), duration=2.0),
+    ])
+    script.add_step(LSE_AddObject(game_world, object=moon_object, motion_script=moon_script))
+    script.add_step(LSE_Wait(game_world, duration=2.0))
+    #player crashes
+    playerscript2=Procedure([
+        MoveObjectToObject(target_object=moon_object, duration=2.0),
+        SpawnSpriteAtObject(sprite=sprite_factory.create_animated_sprite("explosion1"), graphics=game_world.graphics)    
+    ],is_loop=True)    
+    script.add_step(LSE_SetPlayerMotionScript(game_world, motion_script=playerscript2))
+    #Need a script that sets another player motion script
+    #game_world.player_object.set_motion_script(playerscript2)
+
+
+#    script.add_step(LSE_PlayerWarpsAway(game_world))
     script.add_step(LSE_Wait(game_world, duration=2.0))
     script.add_step(LSE_EndLevel(game_world))
     
     
     return script
 
-#Level two: dodge missiles
+#Level two: shoot down asteroids
 def get_leveltwo_script(game_world: GameWorld):
     screen_size=game_world.graphics.screen_size

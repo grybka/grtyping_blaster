@@ -145,11 +145,7 @@ class Target(WorldObject):
             self.unsuccessful_completion()
         #execute incorrect letters script here
 
-    def schedule_for_removal(self):
-        self.should_remove=True
-
-    def check_should_remove(self):
-        return self.should_remove
+    
 
     def finalize(self):
         #called right before it will be removed
@@ -282,11 +278,11 @@ class ShootingTarget(Target):
 
 class CutsceneTargetComms(Target):
     # A window that displayes a cutscene communication and closes on keypress
-    def __init__(self, text, game_world,motion_script: Procedure=None,object_sprite=None,character_image=None):
+    def __init__(self, text, game_world,motion_script: Procedure=None,object_sprite=None,character_image=None,typing_error_rate=0,typing_speed=7,position=(200,200),speaker_name=""):
         super().__init__(text, game_world,motion_script,object_sprite,attack_on_error=False)        
         self.is_alive=True #willing to accept input
-        self.sprite_with_window=CutsceneCommunication(character_image,text)
-        self.set_position( (200,200))
+        self.sprite_with_window=CutsceneCommunication(character_image,text,typing_error_rate=typing_error_rate,typing_speed=typing_speed,speaker_name=speaker_name)
+        self.set_position( position)
         self.sprite_with_window.set_text(text)
 
     def start(self):

@@ -17,7 +17,7 @@ class ProcedureStep:
     def set_property(self, property_name, value):
         #Many steps have a source sprite, or target, or something
         #So we can have generic properties, we use this
-        return False
+        return False    
 
 class SimultaneousProcedureStep(ProcedureStep):
     def __init__(self, steps=None):
@@ -78,4 +78,4 @@ class Procedure:
         return any(tf)
     
     def is_done(self):
-        return self.on_step >= len(self.procedure_steps) or len(self.procedure_steps)==0
+        return self.on_step >= len(self.procedure_steps) or len(self.procedure_steps)==0        

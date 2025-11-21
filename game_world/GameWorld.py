@@ -11,6 +11,7 @@ class WorldObject: #an object in the game world, usually drawn to the screen
     def __init__(self,position=(0,0)):
         self.motion_script=Procedure()
         self.position=position        
+        self.should_remove=False
         #self.set_position(position)        
 
     def get_sprites(self):
@@ -32,10 +33,10 @@ class WorldObject: #an object in the game world, usually drawn to the screen
         self.motion_script = motion_script
 
     def schedule_for_removal(self):
-        pass
+        self.should_remove=True
 
     def check_should_remove(self):
-        return False
+        return self.should_remove    
     
     def finalize(self):
         #called before removal
@@ -43,6 +44,10 @@ class WorldObject: #an object in the game world, usually drawn to the screen
 
     def is_targetable(self):
         return False
+    
+    def start(self):
+        pass
+
 
 class GameWorld:
     def __init__(self,graphics: Graphics):

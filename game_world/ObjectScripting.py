@@ -26,6 +26,21 @@ class SetObjectPosition(ObjectScriptStep):
     def update(self, time_delta):
         self.object.set_position(self.position)
 
+
+class SetObjectPositionToOtherObject(ObjectScriptStep):
+    # This motion script element sets the object to a specific position instantly
+    def __init__(self, object: WorldObject=None, target: WorldObject=None):
+        super().__init__(object)
+        self.target = target
+        self.is_done_flag = False
+
+    def is_done(self):
+        return self.is_done_flag
+
+    def update(self, time_delta):
+        self.object.set_position(self.target.get_position())
+        self.is_done_flag = True
+
 class MoveObjectToPosition(ObjectScriptStep):
     # This motion script element moves the object to a target position at a given speed
     def __init__(self, end_position, object: WorldObject=None, duration=None):
@@ -162,6 +177,7 @@ class SpawnSpriteAtObject(ObjectScriptStep):
         if self.spawned_sprite is None:
             self.spawned_sprite = self.sprite
             position = self.object.get_position()
+            print("spawning sprite at ", position)
             self.spawned_sprite.set_world_position(position)
             self.graphics.add_sprite(self.spawned_sprite)
             self.is_done_flag = True
@@ -175,6 +191,7 @@ class DespawnSelfObject(ObjectScriptStep):
         return self.is_done_flag
 
     def update(self, time_delta):
+        print("Despawning object ", self.object)
         self.object.schedule_for_removal()
         self.is_done_flag = True
         

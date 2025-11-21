@@ -2,17 +2,19 @@ import pygame
 from game_state.GameManagerBase import GameState, GameManagerBase, GameStatus
 from game_world.GameWorld import GameWorld
 from graphics.Graphics import Graphics
-from game_state.GameLevels import get_levelone_script, get_leveltwo_script
+from game_state.GameLevels import *
 from sound.Sound import get_sound_store
 
 class PlayGameLevel(GameState):
-    def __init__(self,screen,level_name="LevelOne"):
+    def __init__(self,screen,level_name={}):
         # Initialize graphics first and pass to world
         self.graphics = Graphics(screen)
         get_sound_store().load_sounds()
         self.world = GameWorld(self.graphics)
-        #self.level_script = get_levelone_script(self.world)
-        self.level_script = get_levelone_script(self.world)
+        if level_name["name"]=="Introduction":
+            self.level_script=get_levelzero_script(self.world)
+        else:        
+            self.level_script = get_levelone_script(self.world)
 
     def start(self):
         self.graphics.show_overlay=True

@@ -1,11 +1,24 @@
-level_1:
-  name: "LevelOne"
-  description: "Flee destruction in your escape pod."
-  map_position: [0.2, 0.2]
-  sprite_image: planet1
-level_2:
-  name: "LevelTwo"
-  description: "Scavange asteroids and avoid enemies."
-  map_position: [0.4, 0.4]
-  sprite_image: planet2
-
+default_level: intro
+levels:
+  intro:
+    name: "Introduction"
+    description: "Somewhere in space..."
+    map_position: [0.1, 0.1]
+    sprite_image: hdf2
+  level_1:
+    name: "LevelOne"
+    description: "Flee destruction in your escape pod."
+    map_position: [0.2, 0.2]
+    sprite_image: hdf2
+  level_2:
+    name: "LevelTwo"
+    description: "Scavange asteroids and avoid enemies."
+    map_position: [0.4, 0.4]
+    sprite_image: planet_moon
+connections:
+  - from: intro
+    to: level_1
+    description: "Escape Pod Launched"
+  - from: level_1
+    to: level_2
+    description: "Entering Asteroid Field"

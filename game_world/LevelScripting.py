@@ -82,7 +82,7 @@ class LSE_AddObject(LevelScriptElement):
     def __init__(self, game_world, object, motion_script):
         super().__init__(game_world)
         self.object = object
-        self.object.set_motion_script(copy.deepcopy(motion_script))
+        self.object.set_motion_script(motion_script)
         self.is_done=False
 
     def start_step(self):
@@ -224,7 +224,7 @@ class LSE_SetPlayerMotionScript(LevelScriptElement):
         self.is_done = False
 
     def update(self, time_delta):
-        self.game_world.player_object.set_motion_script(copy.deepcopy(self.motion_script))
+        self.game_world.player_object.set_motion_script(self.motion_script)
         self.is_done = True
 
     def step_done(self):

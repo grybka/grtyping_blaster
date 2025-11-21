@@ -169,17 +169,21 @@ ship6:
           frames: [0,1,2,3]
           frame_durations: [0.1,0.1,0.1,0.1]
           loop: true           
-ship4x:
+ship_destroyer:
   file: "data\\sprite_sheets\\destroyer.png"
   rect: [0, 0, 478, 348]
   rotation: 180
   scale: 0.25
-ship2x:
-  file: "data\\sprite_sheets\\cruiser.png"
-  rect: [0, 0, 397, 149]
-  rotation: -90
-  scale: 0.25
-ship3x:
+ship_carrier:
+  file: "data\\sprite_sheets\\carrier.png"
+#  rect: [0, 0, 397, 149]
+  rotation: 0
+  scale: 0.5
+ship_a1:
+  file: "data\\sprite_sheets\\Example_ships\\1B.png"
+  scale: 0.75
+  rotation: 90
+ship_a2:
   file: "data\\sprite_sheets\\Example_ships\\1B.png"
   scale: 0.75
 explosion1:
@@ -205,9 +209,32 @@ explosion1:
           [708,562,64,64],
           [642,938,64,64],
           [632,872,64,64]]
+alphabet:
+  file: "data\\sprite_sheets\\alphabet.png"  
 asteroid1:
   file: "data\\sprite_sheets\\asteroids.png"
   rect: [0, 0, 64, 64]
+planet_forest:
+  file: "data\\sprite_sheets\\planets_no_alpha\\b-1.png"  
+  scale: 0.25
+planet_moon:
+  file: "data\\sprite_sheets\\planets_no_alpha\\m-2.png"  
+  scale: 0.5
+planet_desert:
+  file: "data\\sprite_sheets\\planets_no_alpha\\rc-23.png"  
+  scale: 0.5
+planet_skies:
+  file: "data\\sprite_sheets\\planets_no_alpha\\rc-27.png"  
+  scale: 0.5
+planet_ice:
+  file: "data\\sprite_sheets\\planets_no_alpha\\rc-24.png"  
+  scale: 0.5
+planet_winter:
+  file: "data\\sprite_sheets\\planets_no_alpha\\rc-8.png"  
+  scale: 0.25
+planet_city:
+  file: "data\\sprite_sheets\\planets_no_alpha\\b-2.png"  
+  scale: 0.25
 planet1:
   file: "data\\sprite_sheets\\planets_no_alpha\\b-1.png"  
   scale: 0.25
@@ -220,6 +247,9 @@ planet3:
 portrait1:
   file: "data\\sprite_sheets\\portraits\\portraits_1.png"
   rect: [0, 0, 128, 128]
+portrait2:
+  file: "data\\sprite_sheets\\portraits\\portraits_1.png"
+  rect: [0, 384, 128, 128]
 debris1:
   file: "data\\sprite_sheets\\clutter_2.png"
   rect: [0, 0, 128, 128]
@@ -247,3 +277,24 @@ debris8:
 debris9:
   file: "data\\sprite_sheets\\clutter_2.png"
   rect: [256, 256, 128, 128]
+hdf1:
+  file: "data\\sprite_sheets\\hdf1.png"
+  scale: 0.25
+hdf2:
+  file: "data\\sprite_sheets\\hdf2.png"  
+  scale: 0.25
+shot1:
+  type: "composite"
+  offset: [16,16]
+  components:
+    shot_thing:
+      images:
+        - data\\Shots\\Shot1\\shot1_1.png
+        - data\\Shots\\Shot1\\shot1_2.png
+        - data\\Shots\\Shot1\\shot1_3.png
+        - data\\Shots\\Shot1\\shot1_4.png
+      animations:
+        normal_shot:
+          frames: [0,1,2,3,2,1]
+          frame_durations: [0.1,0.1,0.1,0.1,0.1,0.1]
+          loop: true     

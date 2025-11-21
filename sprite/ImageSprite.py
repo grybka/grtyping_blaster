@@ -2,6 +2,28 @@ import pygame
 import math
 from graphics.GraphicsBase import ScreenSprite, WorldSprite
 
+class LineSprite(ScreenSprite):
+    def __init__(self, start_pos, end_pos, color=(255,255,255), width=1):
+        super().__init__(start_pos)
+        self.start_pos=start_pos
+        self.end_pos=end_pos
+        self.color=color
+        self.width=width
+
+    def get_screen_rect(self, camera):
+        start_screen_pos=self.start_pos
+        end_screen_pos=self.end_pos        
+        min_x=min(start_screen_pos[0],end_screen_pos[0])
+        min_y=min(start_screen_pos[1],end_screen_pos[1])
+        max_x=max(start_screen_pos[0],end_screen_pos[0])
+        max_y=max(start_screen_pos[1],end_screen_pos[1])
+        return (min_x,min_y,max_x-min_x,max_y-min_y)
+    
+    def draw(self, screen, camera):
+        start_screen_pos = self.start_pos
+        end_screen_pos = self.end_pos
+        pygame.draw.line(screen, self.color, start_screen_pos, end_screen_pos, self.width)
+
 class ImageSprite(WorldSprite):
     def __init__(self,image,world_position=(0,0),angle=0):
         WorldSprite.__init__(self,world_position)
