@@ -17,6 +17,25 @@ from game_world.SceneObjects import SceneObject
 
 import random
 
+#Shared word factory
+text_factory=TextFactory()
+text_factory.load_text_category("letters","data/words/letters.txt")
+text_factory.load_text_category("short", "data/short_words.txt")
+text_factory.load_text_category("medium", "data/medium_words.txt")
+text_factory.load_text_category("long", "data/long_words.txt")
+
+def add_n_targets(n_targets,textname,spritenames,target_type=ChargingTarget,time_limit=-1,entry_points=[],hold_points=[]):                            
+    steps=[]
+    entry_motions=get_n_entry_motion_procedures(n_targets,entry_points=entry_points, hold_points=hold_points,time_limit=time_limit)        
+    for i in range(n_targets):
+        if isinstance(spritenames,str):
+            spritename=spritenames[0]
+        else:
+            spritename=random.choice(spritenames)
+        text=text_factory.generate_random_text(textname)            
+        steps.append( LSE_AddTarget(game_world, object=target_type(text=text, game_world=game_world,object_sprite=sprite_factory.create_image_sprite(spritename)), motion_script=entry_motions[i]) )
+    return steps
+
 def get_levelzero_script(game_world: GameWorld):
     screen_size=game_world.graphics.screen_size
     offscreen=100
@@ -152,11 +171,18 @@ def get_n_entry_motion_procedures(n_procs,entry_points=None, hold_points=None,ti
     return procs    
 
 def get_space_entry_points(graphics):
+    return get_entry_points(graphics,angle_max=math.pi*0.5, angle_min=-math.pi*0.5)
+
+def get_atmosphere_entry_points(graphics):
+    return get_entry_points(graphics,angle_max=math.pi*0.5, angle_min=-math.pi*0.25)
+
+def get_entry_points(graphics,angle_max,angle_min)
     #Space entry points are anywhere from a 180 degree arc from the right of the screen
     n_points=10
     space_entry_points=[]
     for i in range(n_points):
-        theta=math.pi*(i/(n_points-1)) - math.pi*0.5
+        theta=angle_min[i] + (angle_max-angle_min)*(i/(n_points-1))
+        #theta=math.pi*(i/(n_points-1)) - math.pi*0.5
         x=0.5+0.6*math.cos(theta)
         y=0.5+0.6*math.sin(theta)
         space_entry_points.append( graphics.frac_to_screen((x,y)) )
@@ -276,7 +302,7 @@ def get_levelone_script(game_world: GameWorld):
     debris_sprites=["debris1","debris2","debris3","debris4","debris5","debris6","debris7","debris8","debris9"]
     script=Procedure()
     #script.add_step(LSE_SetBackground(game_world,load_background("forest",velocity=500)))
-    script.add_step(LSE_SetBackground(game_world,load_background("space",velocity=500)))
+    script.add_step(LSE_SetBackground(game_world,load_background("space",velocity=250)))
     #script.add_step(LSE_SetBackground(game_world,load_background("skies",velocity=500)))
     script.add_step(LSE_AddTarget(game_world,object=CutsceneTargetComms(game_world=game_world,text="Theo, you need to avoid the space debris!  If they knock out your shields, you're doomed",character_image="portrait1"),motion_script=Procedure()))
     script.add_step(LSE_WaitForNoTargets(game_world))
@@ -290,6 +316,8 @@ def get_levelone_script(game_world: GameWorld):
             script.add_step(step)
         script.add_step(LSE_WaitForNoTargets(game_world))
     script.add_step(LSE_AddTarget(game_world,object=CutsceneTargetComms(game_world=game_world,text="They're coming faster!  You'll have to type quickly!",character_image="portrait1"),motion_script=Procedure()))
+    script.add_step(LSE_UpdateBackground(game_world, property_name="velocity", property_value=500))
+
     script.add_step(LSE_WaitForNoTargets(game_world))    
     steps=add_n_targets(2,"letters",debris_sprites,time_limit=5.0)
     for step in steps:
@@ -303,6 +331,8 @@ def get_levelone_script(game_world: GameWorld):
     for step in steps:
         script.add_step(step)
     script.add_step(LSE_WaitForNoTargets(game_world))
+    script.add_step(LSE_UpdateBackground(game_world, property_name="velocity", property_value=800))
+    script.add_step(LSE_Wait(game_world, duration=1.0))
     steps=add_n_targets(3,"letters",debris_sprites,time_limit=2.0)
     for step in steps:
         script.add_step(step)
@@ -344,3 +374,29 @@ def get_levelone_script(game_world: GameWorld):
 #Level two: shoot down asteroids
 def get_leveltwo_script(game_world: GameWorld):
     screen_size=game_world.graphics.screen_size
+    entry_points, hold_points = get_atmosphere_entry_points(game_world.graphics)
+    asteroid_sprites=["asteroid1"]
+    
+    sprite_factory=get_sprite_factory()
+
+    #TODO make default ship movement script
+    playerobject=PlayerObject(sprite_factory.create_composite_sprite("ship2"), position=(100, 100))
+    playerscript=Procedure([
+        MoveObjectToPosition_Smooth(end_position=(300,300),duration=2.0),
+        WobbleObject(amplitude_x=10, amplitude_y=10, frequency_x=1.0, frequency_y=0.2, duration=-1.0)
+    ],is_loop=True)
+    game_world.add_player(playerobject)
+    game_world.set_default_player_script(playerscript)
+    script=Procedure()
+    script.add_step(LSE_SetBackground(game_world,load_background("moon",velocity=500)))
+    script.add_step(LSE_Wait(game_world, duration=1.0))
+    steps=add_n_targets(3,"short",asteroid_sprites,time_limit=2.0)
+    for step in steps:
+        script.add_step(step)
+    script.add_step(LSE_WaitForNoTargets(game_world))
+    script.add_step(LSE_PlayerWarpsAway(game_world))
+    script.add_step(LSE_Wait(game_world, duration=2.0))
+    script.add_step(LSE_EndLevel(game_world))
+    return script
+
+
