@@ -103,6 +103,7 @@ class Target(WorldObject):
     def correct_letter_typed(self):
         self.on_char += 1
         self.sprite_with_window.text_window.correct_letter_typed()
+        self.game_world.letters_hit += 1
         if self.on_char < len(self.text):
             ...
         else:
@@ -141,6 +142,8 @@ class Target(WorldObject):
     def incorrect_letter_typed(self):
         get_sound_store().play_sound("mistype")
         self.sprite_with_window.text_window.incorrect_letter_typed()
+        self.game_world.letters_missed  += 1
+
         if self.attack_on_error:
             self.unsuccessful_completion()
         #execute incorrect letters script here

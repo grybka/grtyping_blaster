@@ -69,6 +69,9 @@ class GameWorld:
         self.player_sprite=None
         print("Game World initialized as ", self)
         self.wait_for_keypress=False
+        #Stats for the level
+        self.letters_hit=0
+        self.letters_missed=0
 
     def add_player(self, player_object: WorldObject):
         self.player_object=player_object

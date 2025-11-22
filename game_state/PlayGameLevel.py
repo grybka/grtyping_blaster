@@ -5,6 +5,14 @@ from graphics.Graphics import Graphics
 from game_state.GameLevels import *
 from sound.Sound import get_sound_store
 
+class LevelScore:
+    def __init__(self,letters_hit, letters_missed):
+        self.letters_hit=letters_hit
+        self.letters_missed=letters_missed
+
+    def get_score(self):
+        return self.letters_hit*10 - self.letters_missed*5
+
 class PlayGameLevel(GameState):
     def __init__(self,screen,level_name={}):
         # Initialize graphics first and pass to world
@@ -37,10 +45,11 @@ class PlayGameLevel(GameState):
 
     def get_status(self):
         if self.world.game_on==False:   
+            score = LevelScore(self.world.letters_hit, self.world.letters_missed).get_score()
             if self.world.player_alive==False:
-                return GameStatus(True, "LevelDoneState")
+                return GameStatus(True, "LevelDoneState", data=score)
             else:
-                return GameStatus(True, "GameOverState")
+                return GameStatus(True, "GameOverState", data=score)
         return GameStatus(False)
         #if self.world.game_on==False:   
         ##    if self.world.player_alive==False:
@@ -52,11 +61,18 @@ class PlayGameLevel(GameState):
 
 
 class LevelDoneState(GameState):
-    def __init__(self,screen,score):
+    def __init__(self,screen,score: LevelScore):
         self.screen=screen
         self.font=pygame.font.Font(None,48)
-        self.text=self.font.render(f"Level Complete!\n   Score: {score}",True,(255,255,255))
+        self.text=self.font.render(f"Level Complete!\n",True,(255,255,255))
         self.text_rect=self.text.get_rect(center=(screen.get_width()//2,screen.get_height()//2))
+        #make a text rect that shows letters hit, letters missed, and score
+        self.letters_hit_text=self.font.render(f"Letters Hit: {score.letters_hit}", True, (255,255,255))
+        self.letters_missed_text=self.font.render(f"Letters Missed: {score.letters_missed}", True, (255,255,255))
+        self.score_text=self.font.render(f"Score: {score.get_score()}", True, (255,255,255))
+        self.letters_hit_rect=self.letters_hit_text.get_rect(center=(screen.get_width()//2,screen.get_height()//2 + 50))
+        self.letters_missed_rect=self.letters_missed_text.get_rect(center=(screen.get_width()//2,screen.get_height()//2 + 100))
+        self.score_rect=self.score_text.get_rect(center=(screen.get_width()//2,screen.get_height()//2 + 150))
         self.score=score
         self.should_quit=False
 
@@ -70,6 +86,9 @@ class LevelDoneState(GameState):
     def draw(self,screen):
         screen.fill((0,0,0))
         screen.blit(self.text,self.text_rect)
+        screen.blit(self.letters_hit_text,self.letters_hit_rect)
+        screen.blit(self.letters_missed_text,self.letters_missed_rect)
+        screen.blit(self.score_text,self.score_rect)
     
     def get_status(self):
         if self.should_quit:
@@ -80,8 +99,15 @@ class GameOverState(GameState):
     def __init__(self,screen,score):
         self.screen=screen
         self.font=pygame.font.Font(None,48)
-        self.text=self.font.render(f"Game Over!\n   Score: {score}",True,(255,0,0))
+        self.text=self.font.render(f"You Got Exploded!",True,(255,0,0))
         self.text_rect=self.text.get_rect(center=(screen.get_width()//2,screen.get_height()//2))
+        #make a text rect that shows letters hit, letters missed, and score
+        self.letters_hit_text=self.font.render(f"Letters Hit: {score.letters_hit}", True, (255,255,255))
+        self.letters_missed_text=self.font.render(f"Letters Missed: {score.letters_missed}", True, (255,255,255))
+        self.score_text=self.font.render(f"Score: {score.get_score()}", True, (255,255,255))
+        self.letters_hit_rect=self.letters_hit_text.get_rect(center=(screen.get_width()//2,screen.get_height()//2 + 50))
+        self.letters_missed_rect=self.letters_missed_text.get_rect(center=(screen.get_width()//2,screen.get_height()//2 + 100))
+        self.score_rect=self.score_text.get_rect(center=(screen.get_width()//2,screen.get_height()//2 + 150))
         self.score=score
         self.should_quit=False
 
@@ -95,6 +121,9 @@ class GameOverState(GameState):
     def draw(self,screen):
         screen.fill((0,0,0))
         screen.blit(self.text,self.text_rect)
+        screen.blit(self.letters_hit_text,self.letters_hit_rect)
+        screen.blit(self.letters_missed_text,self.letters_missed_rect)
+        screen.blit(self.score_text,self.score_rect)
 
     def get_status(self):
         if self.should_quit:
