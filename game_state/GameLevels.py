@@ -326,8 +326,7 @@ def get_levelone_script(game_world: GameWorld):
     script.add_step(LSE_Wait(game_world, duration=2.0))
     #player crashes
     playerscript2=Procedure([
-        MoveObjectToObject(target_object=moon_object, duration=2.0),
-        SpawnSpriteAtObject(sprite=sprite_factory.create_animated_sprite("explosion1"), graphics=game_world.graphics)    
+        MoveObjectToObject(target_object=moon_object, duration=2.0),           
     ],is_loop=True)    
     script.add_step(LSE_SetPlayerMotionScript(game_world, motion_script=playerscript2))
     #Need a script that sets another player motion script
