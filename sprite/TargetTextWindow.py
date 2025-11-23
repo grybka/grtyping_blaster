@@ -88,6 +88,10 @@ class TargetTextWindow(ScreenSprite):
         self.show_timer = False
         self.time_left = 5.0
         self.total_time = 5.0
+        self.timer_color=(0,255,0)
+
+    def set_timer_color(self,color):
+        self.timer_color=color
 
     def update_timer(self, time_left, total_time):
         self.show_timer = True
@@ -155,7 +159,7 @@ class TargetTextWindow(ScreenSprite):
             time_ratio = max(self.time_left / self.total_time, 0)
             current_bar_width = int(timer_bar_width * time_ratio)
             timer_bar_rect = pygame.Rect(screen_rect[0]+border_width, screen_rect[1] + screen_rect[3] - timer_bar_height-border_width, current_bar_width, timer_bar_height)
-            pygame.draw.rect(screen, (0, 255, 0), timer_bar_rect)
+            pygame.draw.rect(screen, self.timer_color, timer_bar_rect)
 
         # Highlight the correctly typed portion
         if self.progress > 0:

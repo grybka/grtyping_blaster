@@ -5,7 +5,7 @@ from sprite.BackgroundParallax import BackgroundParallax, BackgroundParallaxStar
 from sprite.SpriteMotionScript import SMSE_MoveToPosition, SMSE_SetPosition, SMSE_MoveToPosition_Smooth, SMSE_Wobble
 from game_world.Procedure import Procedure, SimultaneousProcedureStep
 from sprite.TestCircle import TestCircle
-from game_world.Target import ChargingTarget, Target, CutsceneTargetComms
+from game_world.Target import AsteroidTarget, SpaceDebris, Target, CutsceneTargetComms
 from sprite.Background import BackgroundStarField
 from sprite.SpriteFactory import SpriteFactory
 from game_state.TextFactory import TextFactory
@@ -23,8 +23,10 @@ text_factory.load_text_category("letters","data/words/letters.txt")
 text_factory.load_text_category("short", "data/short_words.txt")
 text_factory.load_text_category("medium", "data/medium_words.txt")
 text_factory.load_text_category("long", "data/long_words.txt")
+sprite_factory=get_sprite_factory()
 
-def add_n_targets(n_targets,textname,spritenames,target_type=ChargingTarget,time_limit=-1,entry_points=[],hold_points=[]):                            
+
+def add_n_targets(n_targets,textname,spritenames,target_type=SpaceDebris,time_limit=-1,entry_points=[],hold_points=[],game_world=None):                            
     steps=[]
     entry_motions=get_n_entry_motion_procedures(n_targets,entry_points=entry_points, hold_points=hold_points,time_limit=time_limit)        
     for i in range(n_targets):
@@ -149,7 +151,7 @@ def get_levelzero_script(game_world: GameWorld):
     return script
 
 #Entry motions for enemies
-def get_n_entry_motion_procedures(n_procs,entry_points=None, hold_points=None,time_limit=-1):
+def get_n_entry_motion_procedures(n_procs,entry_points=None, hold_points=None):
     procs=[]
     used_entry_points=[]
     used_hold_points=[]
@@ -164,7 +166,7 @@ def get_n_entry_motion_procedures(n_procs,entry_points=None, hold_points=None,ti
         proc=Procedure([
             SetObjectPosition(object=None, position=entry_point),
             MoveObjectToPosition_Smooth(object=None, end_position=hold_point, duration=2.0),
-            StartTimer(time_amount=time_limit, object=None),
+            StartTimer(),
             WobbleObject(object=None, amplitude_x=10, amplitude_y=10, frequency_x=1.0, frequency_y=0.2, duration=-1.0)
         ])
         procs.append(proc)
@@ -176,12 +178,12 @@ def get_space_entry_points(graphics):
 def get_atmosphere_entry_points(graphics):
     return get_entry_points(graphics,angle_max=math.pi*0.5, angle_min=-math.pi*0.25)
 
-def get_entry_points(graphics,angle_max,angle_min)
+def get_entry_points(graphics,angle_max,angle_min):
     #Space entry points are anywhere from a 180 degree arc from the right of the screen
     n_points=10
     space_entry_points=[]
     for i in range(n_points):
-        theta=angle_min[i] + (angle_max-angle_min)*(i/(n_points-1))
+        theta=angle_min + (angle_max-angle_min)*(i/(n_points-1))
         #theta=math.pi*(i/(n_points-1)) - math.pi*0.5
         x=0.5+0.6*math.cos(theta)
         y=0.5+0.6*math.sin(theta)
@@ -289,14 +291,14 @@ def get_levelone_script(game_world: GameWorld):
 
     def add_n_targets(n_targets,textname,spritenames,time_limit=-1):                            
         steps=[]
-        entry_motions=get_n_entry_motion_procedures(n_targets,entry_points=space_entry_points, hold_points=space_hold_points,time_limit=time_limit)        
+        entry_motions=get_n_entry_motion_procedures(n_targets,entry_points=space_entry_points, hold_points=space_hold_points)        
         for i in range(n_targets):
             if isinstance(spritenames,str):
                 spritename=spritenames[0]
             else:
                 spritename=random.choice(spritenames)
             text=text_factory.generate_random_text(textname)            
-            steps.append( LSE_AddTarget(game_world, object=ChargingTarget(text=text, game_world=game_world,object_sprite=sprite_factory.create_image_sprite(spritename)), motion_script=entry_motions[i]) )
+            steps.append( LSE_AddTarget(game_world, object=SpaceDebris(text=text, game_world=game_world,object_sprite=sprite_factory.create_image_sprite(spritename),time_limit=time_limit), motion_script=entry_motions[i]) )
         return steps
 
     debris_sprites=["debris1","debris2","debris3","debris4","debris5","debris6","debris7","debris8","debris9"]
@@ -374,11 +376,32 @@ def get_levelone_script(game_world: GameWorld):
 def get_leveltwo_script(game_world: GameWorld):
     screen_size=game_world.graphics.screen_size
     entry_points, hold_points = get_atmosphere_entry_points(game_world.graphics)
-    asteroid_sprites=["asteroid1"]
-    
-    sprite_factory=get_sprite_factory()
+    asteroid_sprites=["asteroid1","asteroid2","asteroid3","asteroid4","asteroid5","asteroid6","asteroid7","asteroid8","asteroid9"]
 
-    #TODO make default ship movement script
+    def add_n_asteroids(n_targets,textname,spritenames,time_limit_1=-1,time_limit_2=-1,entry_points=[],hold_points=[],game_world=None): 
+        wpm_target_1=25
+        wpm_target_2=10
+        cps_target_1=5.0*wpm_target_1/60.0
+        cps_target_2=5.0*wpm_target_2/60.0
+        steps=[]
+        entry_motions=get_n_entry_motion_procedures(n_targets,entry_points=entry_points, hold_points=hold_points)        
+        words=[]
+        n_chars=0
+        words=text_factory.generate_n_random_text(textname,n_targets)
+        for word in words:
+            n_chars += len(word)        
+        total_time_limit_1=n_chars/cps_target_1
+        total_time_limit_2=n_chars/cps_target_2-total_time_limit_1
+        for i in range(n_targets):
+            if isinstance(spritenames,str):
+                spritename=spritenames[0]
+            else:
+                spritename=random.choice(spritenames)
+            text=text_factory.generate_random_text(textname)                        
+            steps.append( LSE_AddTarget(game_world, object=AsteroidTarget(text=text, game_world=game_world,object_sprite=sprite_factory.create_image_sprite(spritename),time_limit_1=total_time_limit_1,time_limit_2=total_time_limit_2), motion_script=entry_motions[i]) )
+        return steps
+
+    
     playerobject=PlayerObject(sprite_factory.create_composite_sprite("ship2"), position=(100, 100))
     playerscript=Procedure([
         MoveObjectToPosition_Smooth(end_position=(300,300),duration=2.0),
@@ -389,10 +412,37 @@ def get_leveltwo_script(game_world: GameWorld):
     script=Procedure()
     script.add_step(LSE_SetBackground(game_world,load_background("moon",velocity=500)))
     script.add_step(LSE_Wait(game_world, duration=1.0))
-    steps=add_n_targets(3,"short",asteroid_sprites,time_limit=2.0)
-    for step in steps:
-        script.add_step(step)
+    script.add_step(LSE_AddTarget(game_world,object=CutsceneTargetComms(game_world=game_world,text="I'll help you get off this moon if you clear it of asteroids for me.  You can even keep any letters that fall out.",character_image="portrait_alien",typing_speed=20,speaker_name="Zorblax"),motion_script=Procedure()))
     script.add_step(LSE_WaitForNoTargets(game_world))
+
+
+    #First three single asteroids
+    for _ in range(3):
+        steps=add_n_asteroids(1,"short",asteroid_sprites,time_limit_1=5.0,time_limit_2=3.0,entry_points=entry_points, hold_points=hold_points, game_world=game_world)
+        for step in steps:
+            script.add_step(step)
+        script.add_step(LSE_WaitForNoTargets(game_world))
+
+    #Then two at a time
+    for _ in range(3):
+        steps=add_n_asteroids(2,"short",asteroid_sprites,time_limit_1=5.0,time_limit_2=3.0,entry_points=entry_points, hold_points=hold_points, game_world=game_world)
+        for step in steps:
+            script.add_step(step)
+        script.add_step(LSE_WaitForNoTargets(game_world))
+
+    #Then three at a time
+    for _ in range(3):
+        steps=add_n_asteroids(3,"short",asteroid_sprites,time_limit_1=5.0,time_limit_2=3.0,entry_points=entry_points, hold_points=hold_points, game_world=game_world)
+        for step in steps:
+            script.add_step(step)
+        script.add_step(LSE_WaitForNoTargets(game_world))
+
+
+    #steps=add_n_targets(3,"short",asteroid_sprites,time_limit=2.0,entry_points=entry_points, hold_points=hold_points, game_world=game_world)
+    #steps=add_n_asteroids(3,"short",asteroid_sprites,time_limit_1=5.0,time_limit_2=3.0,entry_points=entry_points, hold_points=hold_points, game_world=game_world)
+    #for step in steps:
+    #    script.add_step(step)
+    #script.add_step(LSE_WaitForNoTargets(game_world))
     script.add_step(LSE_PlayerWarpsAway(game_world))
     script.add_step(LSE_Wait(game_world, duration=2.0))
     script.add_step(LSE_EndLevel(game_world))

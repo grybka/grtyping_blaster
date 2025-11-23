@@ -14,3 +14,14 @@ class TextFactory:
         if category_name not in self.text_categories:
             raise Exception("Text category not found: "+category_name)
         return random.choice(self.text_categories[category_name])
+    
+    def generate_n_random_text(self,category_name,n):
+        if category_name not in self.text_categories:
+            raise Exception("Text category not found: "+category_name)
+        chosen_words=[]
+        for _ in range(n):
+            my_choice=random.choice(self.text_categories[category_name])
+            while my_choice in chosen_words:
+                my_choice=random.choice(self.text_categories[category_name])
+            chosen_words.append(my_choice)
+        return chosen_words        

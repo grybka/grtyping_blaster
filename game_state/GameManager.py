@@ -1,6 +1,7 @@
 from game_state.GameManagerBase import GameState, GameManagerBase, GameStatus
 from game_state.PlayGameLevel import LevelDoneState, PlayGameLevel, GameOverState
 from game_state.LevelSelect import LevelSelectState
+from game_state.GlobalPlayerState import GlobalPlayerState
 import pygame
 
 class FadeCutState(GameState):
@@ -57,6 +58,7 @@ class GameManager(GameManagerBase):
     def __init__(self,screen,on_game_state=None):
         super().__init__(on_game_state)
         self.screen=screen
+        self.global_player_state=GlobalPlayerState()
 
     def next_state(self, status):
         if status.change_state:
@@ -66,21 +68,21 @@ class GameManager(GameManagerBase):
             if status.new_state=="PlayGameLevel":
                 #TODO get level name
                 #self.on_game_state=PlayGameLevel(self.screen,level_name=status.data)
-                self.on_game_state=FadeCutState(self.screen,PlayGameLevel(self.screen,level_name=status.data))
+                self.on_game_state=FadeCutState(self.screen,PlayGameLevel(self.screen,level_name=status.data, global_player_state=self.global_player_state))
             if status.new_state=="LevelDoneState":
                 score=status.data
                 #self.on_game_state=LevelDoneState(self.screen,score)
-                self.on_game_state=FadeCutState(self.screen,LevelDoneState(self.screen,score))
+                self.on_game_state=FadeCutState(self.screen,LevelDoneState(self.screen,score, global_player_state=self.global_player_state))
             if status.new_state=="GameOverState":
                 score=status.data
                 #self.on_game_state=GameOverState(self.screen,score)
-                self.on_game_state=FadeCutState(self.screen,GameOverState(self.screen,score))
+                self.on_game_state=FadeCutState(self.screen,GameOverState(self.screen,score, global_player_state=self.global_player_state))
             if status.new_state=="Quit":
                 pygame.quit()
                 exit()
             if status.new_state=="LevelSelectState":
                 #self.on_game_state=LevelSelectState(self.screen)                                
-                self.on_game_state=FadeCutState(self.screen,LevelSelectState(self.screen))
+                self.on_game_state=FadeCutState(self.screen,LevelSelectState(self.screen, global_player_state=self.global_player_state))
             self.on_game_state.start()
 
         #if status=="LevelDone":

@@ -161,7 +161,8 @@ class GameMap:
         graphics.add_sprite(self.descript_box)
 
 class LevelSelectState(GameState):
-    def __init__(self, screen):
+    def __init__(self, screen, global_player_state=None):
+        super().__init__(global_player_state)
         self.graphics = Graphics(screen)        
         sprite_factory=get_sprite_factory()
         self.level_map = GameMap()

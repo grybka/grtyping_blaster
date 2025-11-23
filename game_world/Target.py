@@ -1,5 +1,6 @@
-from game_world.ObjectScripting import DamagePlayer, DespawnSelfObject, MoveObjectToPosition, MoveObjectToPosition_Smooth, MoveObjectToObject, SpawnSpriteAtObject
+from game_world.ObjectScripting import DamagePlayer, DespawnOtherObject, DespawnSelfObject, MoveObjectToPosition, MoveObjectToPosition_Smooth, MoveObjectToObject, PlaySound, SetObjectPositionToOtherObject, SpawnSpriteAtObject
 from game_world.Procedure import Procedure
+from game_world.SceneObjects import SceneObject
 from sprite.ImageSprite import ShrinkingSprite
 from sprite.TargetTextWindow import TargetTextWindow
 from sprite.TestCircle import TestCircle
@@ -69,6 +70,11 @@ class Target(WorldObject):
         self.is_alive=True #Used to see if it can shoot back at the player
         #
         self.attack_on_error=attack_on_error
+        #for keeping track of wpm
+        self.typing_timer=0.0
+        self.letters_typed=0
+        self.typing_timer_on=False
+        self.collectable_letters=0
 
     def start(self):
         self.graphics.add_sprite(self.sprite_with_window)
@@ -92,6 +98,12 @@ class Target(WorldObject):
             if self.text[self.on_char] == char:
                 self.correct_letter_typed()
                 #print("correct letter typed")
+                if not self.typing_timer_on and len(self.text)>1: #don't use timer for single letter targets
+                    self.typing_timer_on=True
+                    self.typing_timer=0.0
+                    self.letters_typed=1
+                else:
+                    self.letters_typed += 1
                 return True
             else:
                 self.incorrect_letter_typed()
@@ -105,11 +117,14 @@ class Target(WorldObject):
         self.sprite_with_window.text_window.correct_letter_typed()
         self.game_world.letters_hit += 1
         if self.on_char < len(self.text):
-            ...
+            self.correct_letter_typed_animation(last_letter=False)
         else:
+            self.correct_letter_typed_animation(last_letter=True)
             self.successful_completion()
             #execute defeated script here
 
+    def correct_letter_typed_animation(self,last_letter=False):
+        pass #this is to be implemented by derived classes
 
         
 #        get_sound_store().play_sound("laser")
@@ -152,11 +167,12 @@ class Target(WorldObject):
 
     def finalize(self):
         #called right before it will be removed
-        self.sprite_with_window.scheduled_for_removal = True        
+        self.sprite_with_window.scheduled_for_removal = True          
 
     def update(self, time_delta):
         super().update(time_delta)
-        #self.motion_script.update(time_delta)
+        if self.typing_timer_on and self.letters_typed<len(self.text):
+            self.typing_timer += time_delta            
         #for anim in self.animations:
         #    anim.update(time_delta)
         #    #make sure animation is finalized before removal
@@ -169,36 +185,14 @@ class Target(WorldObject):
     def is_targetable(self):
         return True
 
-
-class ChargingTarget(Target):
-    # A target that charges the player on completion
-    def __init__(self, text, game_world,motion_script: Procedure=None,object_sprite=None,time_limit=-1):
-        super().__init__(text, game_world,motion_script,object_sprite)
+#Base classes for different target types
+class ChargeableTarget: 
+    # A target that charges the player on completion  MIX_IN
+    def __init__(self):
         self.hit_player=False
-        self.is_alive=True #willing to accept input
-        self.has_timer=False
-        self.elapsed_time=0
-        self.time_limit=time_limit
-        self.timer_started=False
+        #super().__init__(text, game_world,motion_script,object_sprite)
 
-    def start_timer(self,time_limit):
-        self.has_timer=True
-        self.timer_started=True
-        self.elapsed_time=0
-        self.time_limit=time_limit
-
-    def update(self, time_delta):
-        super().update(time_delta)
-        if self.has_timer and self.timer_started and self.time_limit>0 and self.is_alive:
-            self.elapsed_time += time_delta
-            self.sprite_with_window.text_window.update_timer(self.time_limit - self.elapsed_time, self.time_limit)
-            if self.elapsed_time > self.time_limit:
-                #time's up
-                self.unsuccessful_completion()
-                self.timer_started=False
-
-
-    def finalize(self):
+    def chargeable_finalize(self):
         #called right before it will be removed
         ...
         #remove sprite
@@ -214,12 +208,9 @@ class ChargingTarget(Target):
             exp_sprite.position=self.sprite_with_window.position
             self.game_world.graphics.add_sprite(exp_sprite)
             #make explosion sound
-            get_sound_store().play_sound("explosion")
-            #TODO damage player
+            get_sound_store().play_sound("explosion")    
 
-
-
-    def successful_completion(self):        
+    def player_dodge_completion(self):        
         #player dodges, misses player
         self.is_alive=False
         impact_time=1.0
@@ -250,7 +241,7 @@ class ChargingTarget(Target):
                                  ])
         self.set_motion_script(target_script)
 
-    def unsuccessful_completion(self):
+    def hit_player_completion(self):
         #player hit, reduce health
         self.hit_player=True
         self.is_alive=False
@@ -258,10 +249,166 @@ class ChargingTarget(Target):
         #same ship but shrinking
         shrinker=ShrinkingSprite(self.sprite_with_window.sprite.image,world_position=self.sprite_with_window.position,angle=0,shrink_duration=0.5)       
         target_script=Procedure([MoveObjectToObject(target_object=self.game_world.player_object,duration=1.0),
-                                 DamagePlayer(damage_amount=10, object=self),                                 
+                                 DamagePlayer(damage_amount=10, object=self),  
+                                 PlaySound("explosion"), 
+                                 SpawnSpriteAtObject(sprite=shrinker, graphics=self.game_world.graphics),                                 
                                  DespawnSelfObject()])
-        self.set_motion_script(target_script)        
+        self.set_motion_script(target_script)       
+
+class ShootableTarget:
+    # A target that can be shot by the player  MIX-IN
+    def __init__(self):
+        self.was_destroyed_by_player=False
+
+    def shootable_letter_typed(self,last_letter=False):
+        #spawn a shot sprite        
+        shot=SceneObject(sprite=get_sprite_factory().create_composite_sprite("shot1"))    
+        #program it to move from player to target
+        if not last_letter:
+            shot_script=Procedure([
+                SetObjectPositionToOtherObject(object=None, target=self.game_world.player_object),
+                MoveObjectToObject(target_object=self, duration=1.0),
+                SpawnSpriteAtObject(sprite=get_sprite_factory().create_animated_sprite("explosion1"), graphics=self.game_world.graphics),
+                DespawnSelfObject()
+            ])
+        else:
+            shot_script=Procedure([
+                SetObjectPositionToOtherObject(object=None, target=self.game_world.player_object),
+                MoveObjectToObject(target_object=self, duration=1.0),
+                SpawnSpriteAtObject(sprite=get_sprite_factory().create_animated_sprite("explosion1"), graphics=self.game_world.graphics),
+                PlaySound("explosion"),
+                DespawnOtherObject(target_object=self),
+                DespawnSelfObject()
+            ])
+        shot.set_motion_script(shot_script)
+        self.game_world.add_world_object(shot)
+
+        #play the laser sound
+        get_sound_store().play_sound("laser")        
+
+    def shootable_finalize(self):
+        if self.was_destroyed_by_player:
+            #explode and shrink
+            #replace ship with shrinking version
+            shrinker=ShrinkingSprite(self.sprite_with_window.sprite.image,world_position=self.sprite_with_window.position,angle=0,shrink_duration=0.5)
+            self.game_world.graphics.add_sprite(shrinker)
+            #explode 
+            exp_sprite=get_sprite_factory().create_animated_sprite("explosion1")
+            exp_sprite.end_on_last_frame=True
+            exp_sprite.position=self.sprite_with_window.position
+            self.game_world.graphics.add_sprite(exp_sprite)
+            #make explosion sound
+            get_sound_store().play_sound("explosion")               
+            return True        
+        return False
+
+    def shot_by_player_completion(self):
+        self.was_destroyed_by_player = True
+        self.schedule_for_removal()
+        #update score?
         
+
+
+
+
+class SpaceDebris(Target,ChargeableTarget):
+    # Charges when timer runs out
+    def __init__(self, text, game_world,motion_script: Procedure=None,object_sprite=None,time_limit=-1):
+        Target.__init__(self, text, game_world,motion_script,object_sprite)   
+        ChargeableTarget.__init__(self)
+        self.is_alive=True #willing to accept input
+        self.has_timer=False
+        self.elapsed_time=0
+        self.time_limit=time_limit
+        self.timer_started=False
+
+    def start_timer(self):
+        self.has_timer=True
+        self.timer_started=True
+        self.elapsed_time=0        
+
+    def update(self, time_delta):
+        super().update(time_delta)
+        if self.has_timer and self.timer_started and self.time_limit>0 and self.is_alive:
+            self.elapsed_time += time_delta
+            self.sprite_with_window.text_window.update_timer(self.time_limit - self.elapsed_time, self.time_limit)
+            if self.elapsed_time > self.time_limit:
+                #time's up
+                self.unsuccessful_completion()
+                self.timer_started=False
+
+    def unsuccessful_completion(self):
+        #charge at player
+        self.hit_player_completion()
+
+    def successful_completion(self):
+        #dodge player
+        self.player_dodge_completion()
+
+    def finalize(self):        
+        return self.chargeable_finalize()
+    
+class AsteroidTarget(Target,ShootableTarget,ChargeableTarget):
+    def __init__(self,text,game_world,motion_script: Procedure=None,object_sprite=None,time_limit_1=0,time_limit_2=-1):
+        Target.__init__(self, text, game_world,motion_script,object_sprite)   
+        ShootableTarget.__init__(self)
+        ChargeableTarget.__init__(self)
+        self.is_alive=True #willing to accept input
+        self.has_timer=False
+        self.elapsed_time=0
+        self.time_limit_1=time_limit_1
+        self.time_limit_2=time_limit_2
+        self.timer_stage=-1 #-1 is not started, 0 is first timer, 1 is second timer        
+       
+    def start_timer(self):
+        self.timer_stage=0
+        self.elapsed_time=0
+
+    def update(self, time_delta):
+        super().update(time_delta)
+        if self.timer_stage>=0 and self.is_alive:
+            self.elapsed_time += time_delta
+            if self.timer_stage==0 and self.time_limit_1>0:
+                self.sprite_with_window.text_window.update_timer(self.time_limit_1 - self.elapsed_time, self.time_limit_1)
+                if self.elapsed_time > self.time_limit_1:
+                    #move to second timer
+                    if self.time_limit_2>0:
+                        self.sprite_with_window.text_window.set_timer_color((255,0,0))
+                        self.timer_stage=1
+                        self.elapsed_time=0
+                    else:
+                        #no second timer, charge at player
+                        self.unsuccessful_completion()
+            elif self.timer_stage==1 and self.time_limit_2>0:
+                self.sprite_with_window.text_window.update_timer(self.time_limit_2 - self.elapsed_time, self.time_limit_2)
+                if self.elapsed_time > self.time_limit_2:
+                    #time's up, charge at player
+                    self.unsuccessful_completion()
+
+    def correct_letter_typed_animation(self,last_letter=False):
+        if self.timer_stage<=0:
+            self.collectable_letters += 1
+            self.shootable_letter_typed(last_letter=last_letter)
+
+
+    def unsuccessful_completion(self):
+        #charge at player
+        self.is_alive=False
+        self.hit_player_completion()
+
+    def successful_completion(self):
+        #if on timer 1 or before, then it gets shot by player
+        self.is_alive=False
+        if self.timer_stage in [0,-1]:
+            ...
+            #no need to do anything, the shot should finalize it
+
+        else:
+            #dodge player
+            self.player_dodge_completion()
+        
+
+
 class ShootingTarget(Target):
     # A target that shoots at the player on incorrect letter
     def __init__(self, text, game_world,motion_script: Procedure=None,object_sprite=None):

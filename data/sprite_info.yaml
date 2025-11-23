@@ -214,6 +214,30 @@ alphabet:
 asteroid1:
   file: "data\\sprite_sheets\\asteroids.png"
   rect: [0, 0, 64, 64]
+asteroid2:
+  file: "data\\sprite_sheets\\asteroids.png"
+  rect: [64, 0, 64, 64]
+asteroid3:
+  file: "data\\sprite_sheets\\asteroids.png"
+  rect: [128, 0, 64, 64]
+asteroid4:
+  file: "data\\sprite_sheets\\asteroids.png"
+  rect: [0, 64, 64, 64]
+asteroid5:
+  file: "data\\sprite_sheets\\asteroids.png"
+  rect: [64, 64, 64, 64]
+asteroid6:
+  file: "data\\sprite_sheets\\asteroids.png"
+  rect: [128, 64, 64, 64]
+asteroid7:
+  file: "data\\sprite_sheets\\asteroids.png"
+  rect: [0, 128, 64, 64]
+asteroid8:
+  file: "data\\sprite_sheets\\asteroids.png"
+  rect: [64, 128, 64, 64]
+asteroid9:
+  file: "data\\sprite_sheets\\asteroids.png"
+  rect: [128, 128, 64, 64]
 planet_forest:
   file: "data\\sprite_sheets\\planets_no_alpha\\b-1.png"  
   scale: 0.25
@@ -250,6 +274,9 @@ portrait1:
 portrait2:
   file: "data\\sprite_sheets\\portraits\\portraits_1.png"
   rect: [0, 384, 128, 128]
+portrait_alien:
+  file: "data\\sprite_sheets\\portraits\\portraits_1.png"
+  rect: [0, 128, 128, 128]
 debris1:
   file: "data\\sprite_sheets\\clutter_2.png"
   rect: [0, 0, 128, 128]

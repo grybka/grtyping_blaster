@@ -2,6 +2,7 @@
 import math
 from game_world.Procedure import ProcedureStep
 from game_world.GameWorld import WorldObject
+from sound.Sound import get_sound_store
 
 class ObjectScriptStep(ProcedureStep):
     def __init__(self, object: WorldObject= None):
@@ -194,6 +195,20 @@ class DespawnSelfObject(ObjectScriptStep):
         print("Despawning object ", self.object)
         self.object.schedule_for_removal()
         self.is_done_flag = True
+
+class DespawnOtherObject(ObjectScriptStep):
+    def __init__(self, target_object: WorldObject, object: WorldObject=None):
+        super().__init__(object)
+        self.target_object = target_object
+        self.is_done_flag = False
+
+    def step_done(self):
+        return self.is_done_flag
+
+    def update(self, time_delta):
+        print("Despawning object ", self.target_object)
+        self.target_object.schedule_for_removal()
+        self.is_done_flag = True
         
 class DamagePlayer(ObjectScriptStep):
     def __init__(self, damage_amount: int, object: WorldObject=None):
@@ -211,9 +226,9 @@ class DamagePlayer(ObjectScriptStep):
 
 class StartTimer(ObjectScriptStep):
     # This starts the timer on targets that have a timer
-    def __init__(self, time_amount: float, object: WorldObject=None):
+    def __init__(self, object: WorldObject=None):
         super().__init__(object)
-        self.time_amount = time_amount
+        #self.time_amount = time_amount
         self.is_done_flag = False
 
     def step_done(self):
@@ -221,5 +236,20 @@ class StartTimer(ObjectScriptStep):
 
     def update(self, time_delta):
         if not self.is_done_flag:
-            self.object.start_timer(self.time_amount)
+            #self.object.start_timer(self.time_amount)
+            self.object.start_timer()
+            self.is_done_flag = True
+
+class PlaySound(ObjectScriptStep):
+    def __init__(self, sound_name: str, object: WorldObject=None):
+        super().__init__(object)
+        self.sound_name = sound_name
+        self.is_done_flag = False
+
+    def step_done(self):
+        return self.is_done_flag
+
+    def update(self, time_delta):
+        if not self.is_done_flag:
+            get_sound_store().play_sound(self.sound_name)
             self.is_done_flag = True

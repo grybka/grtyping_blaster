@@ -1,4 +1,5 @@
 import pygame
+from game_state.GlobalPlayerState import GlobalPlayerState
 
 
 class GameStatus:
@@ -8,8 +9,11 @@ class GameStatus:
         self.data = data
 
 class GameState: #abstract base class
-    def __init__(self):
-        ...
+    def __init__(self, global_player_state=None):
+        self.global_player_state= global_player_state
+
+    def set_global_player_state(self, global_player_state: GlobalPlayerState):
+        self.global_player_state=global_player_state
 
     def start(self):
         #called when it first starts updating

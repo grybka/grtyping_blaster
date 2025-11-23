@@ -9,20 +9,27 @@ class LevelScore:
     def __init__(self,letters_hit, letters_missed):
         self.letters_hit=letters_hit
         self.letters_missed=letters_missed
+        self.letters_typed=0
+        self.letter_timing=0
+        self.letters_collected=0
 
     def get_score(self):
         return self.letters_hit*10 - self.letters_missed*5
 
 class PlayGameLevel(GameState):
-    def __init__(self,screen,level_name={}):
+    def __init__(self,screen,level_name={}, global_player_state=None):
+        super().__init__(global_player_state)
         # Initialize graphics first and pass to world
         self.graphics = Graphics(screen)
         get_sound_store().load_sounds()
         self.world = GameWorld(self.graphics)
         if level_name["name"]=="Introduction":
             self.level_script=get_levelzero_script(self.world)
-        else:        
+        elif level_name["name"]=="LevelOne":        
             self.level_script = get_levelone_script(self.world)
+        elif level_name["name"]=="LevelTwo":        
+            self.level_script = get_leveltwo_script(self.world)
+
 
     def start(self):
         self.graphics.show_overlay=True
@@ -45,8 +52,11 @@ class PlayGameLevel(GameState):
 
     def get_status(self):
         if self.world.game_on==False:   
-            score = LevelScore(self.world.letters_hit, self.world.letters_missed).get_score()
-            if self.world.player_alive==False:
+            score = LevelScore(self.world.letters_hit, self.world.letters_missed)
+            score.letters_typed=self.world.letters_timed
+            score.letter_timing=self.world.letter_timing
+            score.letters_collected=self.world.letters_collected
+            if self.world.player_alive==True:
                 return GameStatus(True, "LevelDoneState", data=score)
             else:
                 return GameStatus(True, "GameOverState", data=score)
@@ -61,7 +71,8 @@ class PlayGameLevel(GameState):
 
 
 class LevelDoneState(GameState):
-    def __init__(self,screen,score: LevelScore):
+    def __init__(self,screen,score: LevelScore, global_player_state=None):
+        super().__init__(global_player_state)
         self.screen=screen
         self.font=pygame.font.Font(None,48)
         self.text=self.font.render(f"Level Complete!\n",True,(255,255,255))
@@ -73,6 +84,15 @@ class LevelDoneState(GameState):
         self.letters_hit_rect=self.letters_hit_text.get_rect(center=(screen.get_width()//2,screen.get_height()//2 + 50))
         self.letters_missed_rect=self.letters_missed_text.get_rect(center=(screen.get_width()//2,screen.get_height()//2 + 100))
         self.score_rect=self.score_text.get_rect(center=(screen.get_width()//2,screen.get_height()//2 + 150))
+        #if letters_timed >0 show wpm
+        if score.letters_typed >0 and score.letter_timing>0:
+            wpm = (score.letters_typed / 5) / (score.letter_timing / 60)
+            self.wpm_text=self.font.render(f"WPM: {wpm:.2f}", True, (255,255,255))
+            self.wpm_rect=self.wpm_text.get_rect(center=(screen.get_width()//2,screen.get_height()//2 + 200))
+        #if letters collected > 0 show letters collected
+        if score.letters_collected >0:
+            self.collected_text=self.font.render(f"Letters Collected: {score.letters_collected}", True, (255,255,255))
+            self.collected_rect=self.collected_text.get_rect(center=(screen.get_width()//2,screen.get_height()//2 + 250))
         self.score=score
         self.should_quit=False
 
@@ -89,14 +109,18 @@ class LevelDoneState(GameState):
         screen.blit(self.letters_hit_text,self.letters_hit_rect)
         screen.blit(self.letters_missed_text,self.letters_missed_rect)
         screen.blit(self.score_text,self.score_rect)
-    
+        if hasattr(self, 'wpm_text'):
+            screen.blit(self.wpm_text, self.wpm_rect)
+        if hasattr(self, 'collected_text'):
+            screen.blit(self.collected_text, self.collected_rect)
     def get_status(self):
         if self.should_quit:
             return GameStatus(True, "LevelSelectState")
         return GameStatus(False)
 
 class GameOverState(GameState):
-    def __init__(self,screen,score):
+    def __init__(self,screen,score, global_player_state=None):
+        super().__init__(global_player_state)
         self.screen=screen
         self.font=pygame.font.Font(None,48)
         self.text=self.font.render(f"You Got Exploded!",True,(255,0,0))

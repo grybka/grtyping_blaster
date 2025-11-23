@@ -72,6 +72,9 @@ class GameWorld:
         #Stats for the level
         self.letters_hit=0
         self.letters_missed=0
+        self.letters_timed=0
+        self.letter_timing=0
+        self.letters_collected=0
 
     def add_player(self, player_object: WorldObject):
         self.player_object=player_object
@@ -111,7 +114,7 @@ class GameWorld:
             return
         targets=[ t for t in self.world_objects if t.is_targetable() and t.is_alive ]            
         #print("n targets available:", len(targets))
-        if self.on_target is None:
+        if self.on_target is None or self.on_target.is_alive==False:
             #figure out which to target
             if len(targets)==1:
                 self.on_target=targets[0]
@@ -144,6 +147,11 @@ class GameWorld:
         for obj in self.world_objects:
             if obj.check_should_remove():                
                 obj.finalize()
+                if obj.is_targetable() and obj.letters_typed>0 and obj.typing_timer>0:
+                    self.letters_timed += obj.letters_typed
+                    self.letter_timing += obj.typing_timer
+                if obj.is_targetable():
+                    self.letters_collected += obj.collectable_letters
         self.world_objects=[obj for obj in self.world_objects if not obj.check_should_remove()]
         
         #update procedures
