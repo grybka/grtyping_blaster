@@ -20,7 +20,7 @@ ship1:
         normal_flight:
           frames: [0,1,2,3]
           frame_durations: [0.1,0.1,0.1,0.1]
-          loop: true        
+          loop: true
         turbo_flight:
           frames: [4,5,6,7]
           frame_durations: [0.1,0.1,0.1,0.1]
@@ -47,7 +47,7 @@ ship2:
         normal_flight:
           frames: [0,1,2,3]
           frame_durations: [0.1,0.1,0.1,0.1]
-          loop: true        
+          loop: true
         turbo_flight:
           frames: [4,5,6,7]
           frame_durations: [0.1,0.1,0.1,0.1]
@@ -66,7 +66,7 @@ ship2:
         normal_flight:
           frames: [0,1,2,3]
           frame_durations: [0.1,0.1,0.1,0.1]
-          loop: true        
+          loop: true
         turbo_flight:
           frames: [4,5,6,7]
           frame_durations: [0.1,0.1,0.1,0.1]
@@ -89,7 +89,7 @@ ship3:
         normal_flight:
           frames: [0,1,2,3]
           frame_durations: [0.1,0.1,0.1,0.1]
-          loop: true           
+          loop: true
 ship4:
   type: "composite"
   offset: [64,64]
@@ -108,7 +108,7 @@ ship4:
         normal_flight:
           frames: [0,1,2,3]
           frame_durations: [0.1,0.1,0.1,0.1]
-          loop: true       
+          loop: true
     ship_exhaust2:
       images:
         - ["data\\ship_anim\\Ship4\\Exhaust\\Normal_flight\\Exhaust1\\exhaust1.png", [ -14, 58]]
@@ -119,7 +119,7 @@ ship4:
         normal_flight:
           frames: [0,1,2,3]
           frame_durations: [0.1,0.1,0.1,0.1]
-          loop: true     
+          loop: true
 ship5:
   type: "composite"
   starting_animation: "normal_flight"
@@ -138,7 +138,7 @@ ship5:
         normal_flight:
           frames: [0,1,2,3]
           frame_durations: [0.1,0.1,0.1,0.1]
-          loop: true    
+          loop: true
 ship6:
   type: "composite"
   starting_animation: "normal_flight"
@@ -157,7 +157,7 @@ ship6:
         normal_flight:
           frames: [0,1,2,3]
           frame_durations: [0.1,0.1,0.1,0.1]
-          loop: true       
+          loop: true
     ship_exhaust2:
       images:
         - ["data\\ship_anim\\Ship6\\Exhaust\\Normal_flight\\Exhaust1\\exhaust1.png", [ -14, 62]]
@@ -168,7 +168,7 @@ ship6:
         normal_flight:
           frames: [0,1,2,3]
           frame_durations: [0.1,0.1,0.1,0.1]
-          loop: true           
+          loop: true
 ship_destroyer:
   file: "data\\sprite_sheets\\destroyer.png"
   rect: [0, 0, 478, 348]
@@ -210,7 +210,7 @@ explosion1:
           [642,938,64,64],
           [632,872,64,64]]
 alphabet:
-  file: "data\\sprite_sheets\\alphabet.png"  
+  file: "data\\sprite_sheets\\alphabet.png"
 asteroid1:
   file: "data\\sprite_sheets\\asteroids.png"
   rect: [0, 0, 64, 64]
@@ -238,45 +238,6 @@ asteroid8:
 asteroid9:
   file: "data\\sprite_sheets\\asteroids.png"
   rect: [128, 128, 64, 64]
-planet_forest:
-  file: "data\\sprite_sheets\\planets_no_alpha\\b-1.png"  
-  scale: 0.25
-planet_moon:
-  file: "data\\sprite_sheets\\planets_no_alpha\\m-2.png"  
-  scale: 0.5
-planet_desert:
-  file: "data\\sprite_sheets\\planets_no_alpha\\rc-23.png"  
-  scale: 0.5
-planet_skies:
-  file: "data\\sprite_sheets\\planets_no_alpha\\rc-27.png"  
-  scale: 0.5
-planet_ice:
-  file: "data\\sprite_sheets\\planets_no_alpha\\rc-24.png"  
-  scale: 0.5
-planet_winter:
-  file: "data\\sprite_sheets\\planets_no_alpha\\rc-8.png"  
-  scale: 0.25
-planet_city:
-  file: "data\\sprite_sheets\\planets_no_alpha\\b-2.png"  
-  scale: 0.25
-planet1:
-  file: "data\\sprite_sheets\\planets_no_alpha\\b-1.png"  
-  scale: 0.25
-planet2:
-  file: "data\\sprite_sheets\\planets_no_alpha\\m-1.png"  
-  scale: 0.5
-planet3:
-  file: "data\\sprite_sheets\\planets_no_alpha\\rc-2.png"  
-  scale: 0.25
-portrait1:
-  file: "data\\sprite_sheets\\portraits\\portraits_1.png"
-  rect: [0, 0, 128, 128]
-portrait2:
-  file: "data\\sprite_sheets\\portraits\\portraits_1.png"
-  rect: [0, 384, 128, 128]
-portrait_alien:
-  file: "data\\sprite_sheets\\portraits\\portraits_1.png"
-  rect: [0, 128, 128, 128]
 debris1:
   file: "data\\sprite_sheets\\clutter_2.png"
   rect: [0, 0, 128, 128]
@@ -300,7 +261,7 @@ debris7:
   rect: [0, 256, 128, 128]
 debris8:
   file: "data\\sprite_sheets\\clutter_2.png"
-  rect: [128, 256, 128, 128]  
+  rect: [128, 256, 128, 128]
 debris9:
   file: "data\\sprite_sheets\\clutter_2.png"
   rect: [256, 256, 128, 128]
@@ -308,7 +269,7 @@ hdf1:
   file: "data\\sprite_sheets\\hdf1.png"
   scale: 0.25
 hdf2:
-  file: "data\\sprite_sheets\\hdf2.png"  
+  file: "data\\sprite_sheets\\hdf2.png"
   scale: 0.25
 shot1:
   type: "composite"
@@ -324,4 +285,7 @@ shot1:
         normal_shot:
           frames: [0,1,2,3,2,1]
           frame_durations: [0.1,0.1,0.1,0.1,0.1,0.1]
-          loop: true     
+          loop: true
+question_mark:
+  file: "data\\sprite_sheets\\misc.png"
+  rect: [0, 0, 64, 64]

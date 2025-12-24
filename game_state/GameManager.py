@@ -66,30 +66,16 @@ class GameManager(GameManagerBase):
                 self.on_game_state=status.data
                 return
             if status.new_state=="PlayGameLevel":
-                #TODO get level name
-                #self.on_game_state=PlayGameLevel(self.screen,level_name=status.data)
                 self.on_game_state=FadeCutState(self.screen,PlayGameLevel(self.screen,level_name=status.data, global_player_state=self.global_player_state))
             if status.new_state=="LevelDoneState":
                 score=status.data
-                #self.on_game_state=LevelDoneState(self.screen,score)
                 self.on_game_state=FadeCutState(self.screen,LevelDoneState(self.screen,score, global_player_state=self.global_player_state))
             if status.new_state=="GameOverState":
                 score=status.data
-                #self.on_game_state=GameOverState(self.screen,score)
                 self.on_game_state=FadeCutState(self.screen,GameOverState(self.screen,score, global_player_state=self.global_player_state))
             if status.new_state=="Quit":
                 pygame.quit()
                 exit()
             if status.new_state=="LevelSelectState":
-                #self.on_game_state=LevelSelectState(self.screen)                                
                 self.on_game_state=FadeCutState(self.screen,LevelSelectState(self.screen, global_player_state=self.global_player_state))
             self.on_game_state.start()
-
-        #if status=="LevelDone":
-        ##    score=self.on_game_state.world.player_score
-            #self.on_game_state.world.end_level()
-        #    self.on_game_state=LevelDoneState(self.screen,score)
-        #elif status=="GameOver":
-        #    score=self.on_game_state.world.player_score
-            #self.on_game_state.world.end_level()
-        #    self.on_game_state=GameOverState(self.screen,score)

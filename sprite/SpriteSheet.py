@@ -19,7 +19,7 @@ class SpriteSheetStore:
     def __init__(self):
         self.loaded_sheets={}
         self.loaded_sprites={}
-        self.sprite_info_file=None
+        self.sprite_info_file={} #actually the data object from several files
 
     def preload_sprites(self):
         for sprite_name in self.sprite_info_file:
@@ -28,7 +28,8 @@ class SpriteSheetStore:
     def load_sheet_info(self,info_fname):
         print("loading sheet info from",info_fname)
         with open(info_fname, 'r') as file:
-            self.sprite_info_file = yaml.safe_load(file)
+            new_data = yaml.safe_load(file)
+            self.sprite_info_file.update(new_data)
 
     def load_sheet(self,sheet_name):
         self.loaded_sheets[sheet_name]=SpriteSheet(sheet_name)

@@ -1,10 +1,12 @@
 default_level: intro
+default_levels_unlocked: [intro]
 levels:
   intro:
     name: "Introduction"
     description: "Somewhere in space..."
     map_position: [0.1, 0.1]
     sprite_image: hdf2
+    unlock_on_win: [level_1]
   level_1:
     name: "LevelOne"
     description: "Flee destruction in your escape pod."

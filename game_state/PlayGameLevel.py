@@ -19,16 +19,23 @@ class LevelScore:
 class PlayGameLevel(GameState):
     def __init__(self,screen,level_name={}, global_player_state=None):
         super().__init__(global_player_state)
+        # ...
+        if len(self.global_player_state.unlocked_levels)==0:
+            for level in level_name["default_levels_unlocked"]:
+                self.global_player_state.unlocked_levels.add(level)
         # Initialize graphics first and pass to world
         self.graphics = Graphics(screen)
         get_sound_store().load_sounds()
         self.world = GameWorld(self.graphics)
+        self.level_info=level_name
         if level_name["name"]=="Introduction":
             self.level_script=get_levelzero_script(self.world)
         elif level_name["name"]=="LevelOne":        
             self.level_script = get_levelone_script(self.world)
         elif level_name["name"]=="LevelTwo":        
             self.level_script = get_leveltwo_script(self.world)
+        else:
+            raise Exception("Unknown level name:"+level_name["name"])
 
 
     def start(self):
@@ -57,6 +64,9 @@ class PlayGameLevel(GameState):
             score.letter_timing=self.world.letter_timing
             score.letters_collected=self.world.letters_collected
             if self.world.player_alive==True:
+                if "unlock_on_win" in self.level_info:
+                    for level in self.level_info["unlock_on_win"]:
+                        self.global_player_state.unlocked_levels.add(level)
                 return GameStatus(True, "LevelDoneState", data=score)
             else:
                 return GameStatus(True, "GameOverState", data=score)

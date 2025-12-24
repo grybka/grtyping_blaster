@@ -35,12 +35,19 @@ class GameMapEntry:
             if self.sprite_selected:
                 self.sprite_selected.set_hidden(True)
 
-    def get_sprites(self):
-        if not self.sprite_selected:
+    def get_sprites(self,unlocked: bool):
+        if unlocked:
             self.sprite_unselected = get_sprite_factory().create_screen_image_sprite(self.image_name,position=self.screen_position)
             self.sprite_selected = ScreenImageSprite(self.sprite_unselected.image.copy(),screen_position=self.screen_position)            
             out_size=self.sprite_selected.image.get_size()
             pygame.draw.rect(self.sprite_selected.image,(255,255,0),(0,0,out_size[0],out_size[1]),5)
+            self.sprite_selected.set_hidden(True)
+            self.sprite_unselected.set_hidden(False)
+        else:
+            self.sprite_unselected = get_sprite_factory().create_screen_image_sprite("question_mark",position=self.screen_position)
+            self.sprite_selected = ScreenImageSprite(self.sprite_unselected.image.copy(),screen_position=self.screen_position)            
+            out_size=self.sprite_selected.image.get_size()
+            pygame.draw.rect(self.sprite_selected.image,(100,100,100),(0,0,out_size[0],out_size[1]),5)
             self.sprite_selected.set_hidden(True)
             self.sprite_unselected.set_hidden(False)
 
@@ -58,11 +65,12 @@ class GameMapConnection:
 #The game map contains information about what levels are available
 #each level is represented by a GameMapEntry
 class GameMap:
-    def __init__(self):
+    def __init__(self,global_player_state=None):
         self.entries = {} # dict of GameMapEntry objects
         self.selected_level=None # key
         self.connections = []        
         self.descript_box=None
+        self.global_player_state=global_player_state
 
     def update(self, time_delta):
         ...
@@ -71,8 +79,11 @@ class GameMap:
         self.selected_level=level_index
         for key, entry in self.entries.items():
             entry.set_selected(False)
-        self.entries[level_index].set_selected(True)        
-        self.descript_box.set_text(self.entries[level_index].level_description)
+        self.entries[level_index].set_selected(True)    
+        if level_index in self.global_player_state.unlocked_levels:
+            self.descript_box.set_text(self.entries[level_index].level_description)
+        else:
+            self.descript_box.set_text("???")            
 
 
     def get_next_right(self,level_index):
@@ -148,9 +159,12 @@ class GameMap:
 
         #create the surface I want to draw the map on
         
-        for _,entry in self.entries.items():        
-            level_sprites=entry.get_sprites()            
-            for level_sprite in level_sprites:
+        for key,entry in self.entries.items():                    
+            if key in self.global_player_state.unlocked_levels:
+                level_sprites=entry.get_sprites(True)
+            else:
+                level_sprites=entry.get_sprites(False) 
+            for level_sprite in level_sprites:                
                 level_sprite.set_screen_position( (int(entry.screen_position[0] * map_size_x), int(entry.screen_position[1] * map_size_y) )                )
                 graphics.add_sprite(level_sprite)                  
 
@@ -161,14 +175,27 @@ class GameMap:
         graphics.add_sprite(self.descript_box)
 
 class LevelSelectState(GameState):
-    def __init__(self, screen, global_player_state=None):
+    def __init__(self, screen, global_player_state):
         super().__init__(global_player_state)
+
+
+
         self.graphics = Graphics(screen)        
         sprite_factory=get_sprite_factory()
-        self.level_map = GameMap()
+        self.level_map = GameMap(global_player_state)
         #load level info from yaml here
         with open("data/levels.yaml", 'r') as file:
             self.level_info_data = yaml.safe_load(file)        
+
+        #make sure default level is unlocked
+        if len(global_player_state.unlocked_levels) == 0:          
+            global_player_state.unlocked_levels.add("intro")
+        if global_player_state.all_levels_unlocked:
+            for level_key in self.level_info_data["levels"].keys():
+                global_player_state.unlocked_levels.add(level_key)
+
+
+
         self.selected_level_index = self.level_info_data.get("default_level", "intro")
 
         for level_key, level_info in self.level_info_data["levels"].items():
@@ -227,11 +254,9 @@ class LevelSelectState(GameState):
                     self.selected_level_index = next_level                                    
                 self.level_map.set_selected_level(self.selected_level_index)
             elif event.key == pygame.K_RETURN:
-                # Start the selected level
-                #selected_level = self.level_map.entries[self.selected_level_index].level_info
-                self.play_level=True
-                #nt(f"Starting level: {selected_level["name"]}")
-                # Here you would typically notify the GameManager to switch states
+                # Start the selected level                
+                if self.selected_level_index in self.global_player_state.unlocked_levels:
+                    self.play_level=True                
 
     def get_status(self):
         if self.play_level:            

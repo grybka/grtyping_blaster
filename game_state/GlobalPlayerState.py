@@ -4,6 +4,7 @@ class GlobalPlayerState:
         self.unlocked_ships=set()
         self.selected_ship="ship1"
         self.total_letters=0
+        self.all_levels_unlocked=False
  
     def unlock_level(self, level_name: str):
         self.unlocked_levels.add(level_name)

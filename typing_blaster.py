@@ -1,7 +1,14 @@
 import pygame
+from game_state.GameManagerBase import GameStatus
 from game_state.LevelSelect import LevelSelectState
 #from game_state.PlayGameLevel import PlayGameLevel,GameManager
 from game_state.GameManager import GameManager
+import argparse
+
+ap = argparse.ArgumentParser()
+ap.add_argument("--unlocked",action="store_true", help="Start with all levels unlocked")
+
+args= ap.parse_args()
 
 pygame.init()
 pygame.font.init()
@@ -22,7 +29,14 @@ screen=pygame.display.set_mode(resolution,pygame.DOUBLEBUF | pygame.HWSURFACE)
 
 #set up game manager
 #game_manager=GameManager(screen,PlayGameLevel(screen))
-game_manager=GameManager(screen,LevelSelectState(screen))
+#game_manager=GameManager(screen,LevelSelectState(screen))
+game_manager=GameManager(screen,None)
+if args.unlocked:
+    game_manager.global_player_state.all_levels_unlocked=True
+
+
+
+game_manager.next_state(GameStatus(True,"LevelSelectState"))
 
 running=True
 while running:

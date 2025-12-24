@@ -8,6 +8,8 @@ from sprite.CompositeSprite import CompositeSprite
 class SpriteFactory:
     def __init__(self):
         get_sprite_store().load_sheet_info("data/sprite_info.yaml")
+        get_sprite_store().load_sheet_info("data/sprite_info_portraits.yaml")
+        get_sprite_store().load_sheet_info("data/sprite_info_planets.yaml")
 
     def create_image_sprite(self,sprite_name,world_position=(0,0),angle=0,scale=1):
         sprite_image=get_sprite_store().get_sprite(sprite_name,scale)
