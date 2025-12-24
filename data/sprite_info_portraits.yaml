@@ -1,0 +1,12 @@
+portrait1:
+  file: "data\\sprite_sheets\\portraits\\portraits_1.png"
+  rect: [0, 0, 128, 128]
+portrait2:
+  file: "data\\sprite_sheets\\portraits\\portraits_1.png"
+  rect: [0, 384, 128, 128]
+portrait_alien:
+  file: "data\\sprite_sheets\\portraits\\portraits_1.png"
+  rect: [0, 128, 128, 128]
+portrait3:
+  file: "data\\sprite_sheets\\portraits\\portraits_2.png"
+  rect: [0, 128, 128, 128]

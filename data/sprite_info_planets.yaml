@@ -1,0 +1,30 @@
+planet_forest:
+  file: "data\\sprite_sheets\\planets_no_alpha\\b-1.png"
+  scale: 0.25
+planet_moon:
+  file: "data\\sprite_sheets\\planets_no_alpha\\m-2.png"
+  scale: 0.5
+planet_desert:
+  file: "data\\sprite_sheets\\planets_no_alpha\\rc-23.png"
+  scale: 0.5
+planet_skies:
+  file: "data\\sprite_sheets\\planets_no_alpha\\rc-27.png"
+  scale: 0.5
+planet_ice:
+  file: "data\\sprite_sheets\\planets_no_alpha\\rc-24.png"
+  scale: 0.5
+planet_winter:
+  file: "data\\sprite_sheets\\planets_no_alpha\\rc-8.png"
+  scale: 0.25
+planet_city:
+  file: "data\\sprite_sheets\\planets_no_alpha\\b-2.png"
+  scale: 0.25
+planet1:
+  file: "data\\sprite_sheets\\planets_no_alpha\\b-1.png"
+  scale: 0.25
+planet2:
+  file: "data\\sprite_sheets\\planets_no_alpha\\m-1.png"
+  scale: 0.5
+planet3:
+  file: "data\\sprite_sheets\\planets_no_alpha\\rc-2.png"
+  scale: 0.25
